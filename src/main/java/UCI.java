@@ -1,6 +1,7 @@
 import java.util.*;
-
-import chesslib.*;
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.move.Move;
+import org.jetbrains.annotations.NotNull;
 
 public class UCI {
     static String ENGINENAME="IA_v0.1";
@@ -69,9 +70,11 @@ public class UCI {
             //System.out.println(input);
             String[] moves = input.split("\\s+");
             //System.out.println(moves[moves.length - 1]);
-
+            if (moves.length > 1)
+            {
+                board.doMove(moves[moves.length - 2]);
+            }
             board.doMove(moves[moves.length - 1]);
-
         }
         }
     public static void inputGo(@NotNull Board board) {
