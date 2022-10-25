@@ -41,7 +41,7 @@ public class UCI {
     }
     public static void inputUCI() {
         System.out.println("id name "+ENGINENAME);
-        System.out.println("id author Jonathan");
+        System.out.println("id author Clément & Justin");
         //options go here
         System.out.println("uciok");
     }
@@ -65,12 +65,10 @@ public class UCI {
             board.loadFromFen(input);
         }
         if (input.contains("moves")) {
-            //System.out.println(input);
             input=input.substring(input.indexOf("moves")+6);
-            //System.out.println(input);
             String[] moves = input.split("\\s+");
-            //System.out.println(moves[moves.length - 1]);
-            if (moves.length > 1)
+
+            if (moves.length > 1) //if not first move
             {
                 board.doMove(moves[moves.length - 2]);
             }
@@ -79,7 +77,6 @@ public class UCI {
         }
     public static void inputGo(@NotNull Board board) {
         //search for first move
-        //System.out.println(board.getFen());
         List<Move> moves = board.legalMoves();
         System.out.println("Legal moves: " + moves);
         System.out.println("bestmove " + moves.get(0));
