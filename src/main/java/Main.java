@@ -2,9 +2,8 @@
 public class Main {
     public static void main(String[] args) {
         //UCI.uciCommunication();
-        int[] scores = Evaluator.scoresFromFen("rnbqkbnr/1ppppppp/8/8/4P3/1p3N2/P1PP1PPP/RNBQKB1R w KQkq - 0 4");
-        System.out.println(scores[0]);
-        System.out.println(scores[1]);
+        int score = Evaluator.scoresFromFen("rnbqkbnr/1ppppppp/8/8/4P3/1p3N2/P1PP1PPP/RNBQKB1R w KQkq - 0 4");
+        System.out.println(score);
 
         //uci
         //isready
