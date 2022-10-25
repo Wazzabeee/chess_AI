@@ -77,8 +77,10 @@ public class UCI {
         }
     public static void inputGo(@NotNull Board board) {
         //search for first move
-        List<Move> moves = board.legalMoves();
-        System.out.println("Legal moves: " + moves);
-        System.out.println("bestmove " + moves.get(0));
+        String[] answer = Search.minimax(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        System.out.println("bestmove " + answer[0]);
+        //List<Move> moves = board.legalMoves();
+        //System.out.println("Legal moves: " + moves);
+        //System.out.println("bestmove " + moves.get(0));
     }
 }

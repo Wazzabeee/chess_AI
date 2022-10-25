@@ -34,7 +34,15 @@ public class Evaluator {
                 pieces.put(key, pieces.getOrDefault(key, 0) + 1);
             }
         }
-        return pieces.get('P') + pieces.get('R') * 5 + pieces.get('N') * 3 + pieces.get('B') * 3 + pieces.get('Q') -
-                (pieces.get('p') + pieces.get('r') * 5 + pieces.get('n') * 3 + pieces.get('b') * 3 + pieces.get('q'));
+
+        return pieces.getOrDefault('P', 0) +
+                    pieces.getOrDefault('R', 0) * 5 +
+                    pieces.getOrDefault('N', 0) * 3 +
+                    pieces.getOrDefault('Q', 0) * 10
+                -
+                (pieces.getOrDefault('p', 0) +
+                        pieces.getOrDefault('r', 0) * 5 +
+                        pieces.getOrDefault('n', 0) * 3 +
+                        pieces.getOrDefault('q', 0) * 10);
     }
 }
