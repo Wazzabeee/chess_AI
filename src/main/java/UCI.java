@@ -25,7 +25,7 @@ public class UCI {
             }
             else if ("ucinewgame".equals(inputString))
             {
-                inputUCINewGame();
+                inputUCINewGame(board);
             }
             else if (inputString.startsWith("position"))
             {
@@ -51,8 +51,8 @@ public class UCI {
     public static void inputIsReady() {
         System.out.println("readyok");
     }
-    public static void inputUCINewGame() {
-        //add code here
+    public static void inputUCINewGame(Board board) {
+        board.loadFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
     public static void inputPosition(String input, Board board) {
         //System.out.println(input);
@@ -76,11 +76,8 @@ public class UCI {
         }
         }
     public static void inputGo(@NotNull Board board) {
-        //search for first move
-        String[] answer = Search.minimax(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        //search for move
+        String[] answer = Search.minimax(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
         System.out.println("bestmove " + answer[0]);
-        //List<Move> moves = board.legalMoves();
-        //System.out.println("Legal moves: " + moves);
-        //System.out.println("bestmove " + moves.get(0));
     }
 }
