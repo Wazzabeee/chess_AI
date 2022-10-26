@@ -12,13 +12,13 @@ import static java.lang.Math.min;
  */
 public class Search {
 
-    public static String[] minimax(Board board, Integer depth, Integer alpha, Integer beta, Boolean playerToMaximize)
+    public static String[] minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
     {
         List<Move> children = board.legalMoves(); // generate all children from current board state
 
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
-            return new String[] {"None", Integer.toString(Evaluator.scoresFromFen(board.getFen()))};
+            return new String[] {"None", String.valueOf(Evaluator.scoresFromFen(board.getFen(), numberOfMoves, playerToMaximize))};
         }
 
         int randomNum = new Random().nextInt(children.size()); // generate a random number in [0; children.size-1]
@@ -26,7 +26,7 @@ public class Search {
 
         if (playerToMaximize)
         {
-            int maxEval = Integer.MIN_VALUE;
+            double maxEval = Double.MIN_VALUE;
             for (Move move : children)
             {
                 // Copy current board state and play current move
@@ -35,7 +35,7 @@ public class Search {
                 temp_board.doMove(move);
 
                 // Compare currentEval with maxEval and alpha beta prunnings
-                int currentEval = Integer.parseInt(minimax(temp_board, depth - 1, alpha, beta, false)[1]);
+                double currentEval = Double.parseDouble(minimax(temp_board, depth - 1, alpha, beta, false, children.size())[1]);
                 if (currentEval > maxEval)
                 {
                     maxEval = currentEval;
@@ -47,18 +47,18 @@ public class Search {
                     break;
                 }
             }
-            return new String[] {best_move.toString(), Integer.toString(maxEval)};
+            return new String[] {best_move.toString(), String.valueOf(maxEval)};
         }
         else
         {
-            int minEval = Integer.MAX_VALUE;
+            double minEval = Double.MAX_VALUE;
             for (Move move : children)
             {
                 Board temp_board = new Board();
                 temp_board.loadFromFen(board.getFen());
                 temp_board.doMove(move);
 
-                int currentEval = Integer.parseInt(minimax(temp_board, depth - 1, alpha, beta, true)[1]);
+                double currentEval = Double.parseDouble(minimax(temp_board, depth - 1, alpha, beta, true, children.size())[1]);
                 if (currentEval < minEval)
                 {
                     minEval = currentEval;
@@ -70,7 +70,7 @@ public class Search {
                     break;
                 }
             }
-            return new String[] {best_move.toString(), Integer.toString(minEval)};
+            return new String[] {best_move.toString(), String.valueOf(minEval)};
         }
     }
 }

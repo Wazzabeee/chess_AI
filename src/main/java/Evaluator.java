@@ -1,3 +1,5 @@
+import com.github.bhlangonijr.chesslib.Board;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +14,21 @@ public class Evaluator {
      * @param fenString de la partie à évaluer
      * @return int : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
-    public static int scoresFromFen(String fenString)
+    public static double scoresFromFen(String fenString, Integer lastPlayerMoves, Boolean white)
     {
+        int m, M;
+        Board b = new Board();
+        b.loadFromFen(fenString);
+        if (white)
+        {
+            M = b.legalMoves().size();
+            m = lastPlayerMoves;
+        }
+        else
+        {
+            m = b.legalMoves().size();
+            M = lastPlayerMoves;
+        }
         // Hashmap to store number of pieces per category
         Map<Character, Integer> pieces = new HashMap<>();
 
@@ -40,7 +55,8 @@ public class Evaluator {
                 + 5 * (pieces.getOrDefault('R', 0) - pieces.getOrDefault('r', 0))
                 + 3 * (pieces.getOrDefault('B', 0) - pieces.getOrDefault('b', 0) +
                     pieces.getOrDefault('N', 0) - pieces.getOrDefault('n', 0))
-                + (pieces.getOrDefault('P', 0) - pieces.getOrDefault('p', 0));
+                + (pieces.getOrDefault('P', 0) - pieces.getOrDefault('p', 0))
+                + 0.1 * (M - m);
     }
 }
 

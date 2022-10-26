@@ -78,7 +78,7 @@ public class UCI {
         //search for move
         // Player to maximize :
         // If AI plays white : true else black
-        String[] answer = Search.minimax(board, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getSideToMove() == Side.WHITE);
+        String[] answer = Search.minimax(board, 4, Double.MIN_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
         System.out.println("bestmove " + answer[0]);
     }
 }
