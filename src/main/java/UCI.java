@@ -1,7 +1,6 @@
 import java.util.*;
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.move.Move;
-import org.jetbrains.annotations.NotNull;
+import com.github.bhlangonijr.chesslib.Side;
 
 public class UCI {
     static String ENGINENAME="IA_v0.1";
@@ -75,9 +74,11 @@ public class UCI {
             board.doMove(moves[moves.length - 1]);
         }
         }
-    public static void inputGo(@NotNull Board board) {
+    public static void inputGo(Board board) {
         //search for move
-        String[] answer = Search.minimax(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+        // Player to maximize :
+        // If AI plays white : true else black
+        String[] answer = Search.minimax(board, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getSideToMove() == Side.WHITE);
         System.out.println("bestmove " + answer[0]);
     }
 }

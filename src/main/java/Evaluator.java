@@ -10,7 +10,7 @@ public class Evaluator {
      * Calcule le score des deux joueurs basé sur la valeur des pièces
      *
      * @param fenString de la partie à évaluer
-     * @return int[whiteScore, blackScore] according to normal pieces valuation (P=1, N=B=3, R=5, Q=10)
+     * @return int : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
     public static int scoresFromFen(String fenString)
     {
@@ -35,14 +35,12 @@ public class Evaluator {
             }
         }
 
-        return pieces.getOrDefault('P', 0) +
-                    pieces.getOrDefault('R', 0) * 5 +
-                    pieces.getOrDefault('N', 0) * 3 +
-                    pieces.getOrDefault('Q', 0) * 10
-                -
-                (pieces.getOrDefault('p', 0) +
-                        pieces.getOrDefault('r', 0) * 5 +
-                        pieces.getOrDefault('n', 0) * 3 +
-                        pieces.getOrDefault('q', 0) * 10);
+        return 200 * (pieces.getOrDefault('K', 0) - pieces.getOrDefault('k', 0))
+                + 9 * (pieces.getOrDefault('Q', 0) - pieces.getOrDefault('q', 0))
+                + 5 * (pieces.getOrDefault('R', 0) - pieces.getOrDefault('r', 0))
+                + 3 * (pieces.getOrDefault('B', 0) - pieces.getOrDefault('b', 0) +
+                    pieces.getOrDefault('N', 0) - pieces.getOrDefault('n', 0))
+                + (pieces.getOrDefault('P', 0) - pieces.getOrDefault('p', 0));
     }
 }
+
