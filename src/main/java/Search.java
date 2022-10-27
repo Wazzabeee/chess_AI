@@ -16,7 +16,7 @@ public class Search {
     {
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
-            return new String[] {"None", String.valueOf(Evaluator.scoresFromFen(board.getFen(), numberOfMoves, playerToMaximize))};
+            return new String[] {"None", String.valueOf(Evaluator.scoresFromFen(board, board.getFen(), numberOfMoves, playerToMaximize))};
         }
 
         List<Move> children = board.legalMoves(); // generate all children from current board state
@@ -25,7 +25,7 @@ public class Search {
 
         if (playerToMaximize)
         {
-            double maxEval = Double.MIN_VALUE;
+            double maxEval = -Double.MIN_VALUE;
             for (Move move : children)
             {
                 board.doMove(move);

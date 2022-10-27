@@ -12,13 +12,23 @@ public class Evaluator {
      * Calcule le score des deux joueurs basé sur la valeur des pièces
      *
      * @param fenString de la partie à évaluer
-     * @return int : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
+     * @return double : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
-    public static double scoresFromFen(String fenString, Integer lastPlayerMoves, Boolean white)
+    public static double scoresFromFen(Board b, String fenString, Integer lastPlayerMoves, Boolean white)
     {
+        if (b.isStaleMate() || b.isDraw()) // if draw return 0
+        {
+            return 0.0;
+        } else if (b.isMated() && white) // if mate and white to play then -inf
+        {
+            return (- Double.MIN_VALUE);
+        } else if (b.isMated() && !white) //if mate and black to play then +inf
+        {
+            return Double.MAX_VALUE;
+        }
+
         int m, M;
-        Board b = new Board();
-        b.loadFromFen(fenString);
+
         if (white)
         {
             M = b.legalMoves().size();
