@@ -14,13 +14,12 @@ public class Search {
 
     public static String[] minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
     {
-        List<Move> children = board.legalMoves(); // generate all children from current board state
-
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
             return new String[] {"None", String.valueOf(Evaluator.scoresFromFen(board.getFen(), numberOfMoves, playerToMaximize))};
         }
 
+        List<Move> children = board.legalMoves(); // generate all children from current board state
         int randomNum = new Random().nextInt(children.size()); // generate a random number in [0; children.size-1]
         Move best_move = children.get(randomNum); // select random move from children
 
@@ -29,13 +28,11 @@ public class Search {
             double maxEval = Double.MIN_VALUE;
             for (Move move : children)
             {
-                // Copy current board state and play current move
-                Board temp_board = new Board();
-                temp_board.loadFromFen(board.getFen());
-                temp_board.doMove(move);
-
+                board.doMove(move);
                 // Compare currentEval with maxEval and alpha beta prunnings
-                double currentEval = Double.parseDouble(minimax(temp_board, depth - 1, alpha, beta, false, children.size())[1]);
+                double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, false, children.size())[1]);
+                board.undoMove();
+
                 if (currentEval > maxEval)
                 {
                     maxEval = currentEval;
@@ -54,11 +51,10 @@ public class Search {
             double minEval = Double.MAX_VALUE;
             for (Move move : children)
             {
-                Board temp_board = new Board();
-                temp_board.loadFromFen(board.getFen());
-                temp_board.doMove(move);
+                board.doMove(move);
+                double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, true, children.size())[1]);
+                board.undoMove();
 
-                double currentEval = Double.parseDouble(minimax(temp_board, depth - 1, alpha, beta, true, children.size())[1]);
                 if (currentEval < minEval)
                 {
                     minEval = currentEval;
