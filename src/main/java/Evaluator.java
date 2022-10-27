@@ -39,6 +39,7 @@ public class Evaluator {
             m = b.legalMoves().size();
             M = lastPlayerMoves;
         }
+
         // Hashmap to store number of pieces per category
         Map<Character, Integer> pieces = new HashMap<>();
 
