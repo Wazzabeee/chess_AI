@@ -38,7 +38,7 @@ public class Search {
                     maxEval = currentEval;
                     best_move = move;
                 }
-                alpha = max(alpha, currentEval);
+                alpha = max(alpha, maxEval);
                 if (beta <= alpha)
                 {
                     break;
@@ -60,7 +60,8 @@ public class Search {
                     minEval = currentEval;
                     best_move = move;
                 }
-                alpha = min(alpha, currentEval);
+                // alpha ?
+                beta = min(beta, minEval);
                 if (beta <= alpha)
                 {
                     break;
