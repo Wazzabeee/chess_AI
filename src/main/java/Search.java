@@ -11,8 +11,8 @@ import static java.lang.Math.min;
  * Search for best moves
  */
 public class Search {
-
-    public static String[] minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
+    public static int nodesExplored = 0;
+    public String[] minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
     {
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
@@ -28,6 +28,7 @@ public class Search {
             double maxEval = -Double.MAX_VALUE;
             for (Move move : children)
             {
+                incrementNodesCount();
                 board.doMove(move);
                 // Compare currentEval with maxEval and alpha beta prunnings
                 double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, false, children.size())[1]);
@@ -51,6 +52,7 @@ public class Search {
             double minEval = Double.MAX_VALUE;
             for (Move move : children)
             {
+                incrementNodesCount();
                 board.doMove(move);
                 double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, true, children.size())[1]);
                 board.undoMove();
@@ -69,5 +71,12 @@ public class Search {
             }
             return new String[] {best_move.toString(), String.valueOf(minEval)};
         }
+    }
+
+    private static void incrementNodesCount() {
+        nodesExplored++;
+    }
+    public int getNodesExplored() {
+        return nodesExplored;
     }
 }

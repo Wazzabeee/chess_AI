@@ -21,7 +21,7 @@ public class Evaluator {
             return 0.0;
         } else if (b.isMated() && white) // if mate and white to play then -inf
         {
-            return (- Double.MAX_VALUE);
+            return -Double.MAX_VALUE;
         } else if (b.isMated() && !white) //if mate and black to play then +inf
         {
             return Double.MAX_VALUE;
