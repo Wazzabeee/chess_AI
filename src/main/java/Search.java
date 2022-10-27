@@ -25,7 +25,7 @@ public class Search {
 
         if (playerToMaximize)
         {
-            double maxEval = -Double.MIN_VALUE;
+            double maxEval = -Double.MAX_VALUE;
             for (Move move : children)
             {
                 board.doMove(move);
