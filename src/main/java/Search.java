@@ -11,12 +11,23 @@ import static java.lang.Math.min;
  * Search for best moves
  */
 public class Search {
+
+    public static class Node{
+        protected String move;
+        protected double score;
+
+        public Node(String move, double score){
+            this.move = move;
+            this.score = score;
+        }
+    }
+
     public static int nodesExplored = 0;
-    public String[] minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
+    public Node minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves)
     {
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
-            return new String[] {"None", String.valueOf(Evaluator.scoresFromFen(board, board.getFen(), numberOfMoves, playerToMaximize))};
+            return new Node("None", Evaluator.scoresFromFen(board, board.getFen(), numberOfMoves, playerToMaximize));
         }
 
         List<Move> children = board.legalMoves(); // generate all children from current board state
@@ -31,7 +42,7 @@ public class Search {
                 incrementNodesCount();
                 board.doMove(move);
                 // Compare currentEval with maxEval and alpha beta prunnings
-                double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, false, children.size())[1]);
+                double currentEval = minimax(board, depth - 1, alpha, beta, false, children.size()).score;
                 board.undoMove();
 
                 if (currentEval > maxEval)
@@ -45,7 +56,7 @@ public class Search {
                     break;
                 }
             }
-            return new String[] {best_move.toString(), String.valueOf(maxEval)};
+            return new Node(best_move.toString(), maxEval);
         }
         else
         {
@@ -54,7 +65,7 @@ public class Search {
             {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = Double.parseDouble(minimax(board, depth - 1, alpha, beta, true, children.size())[1]);
+                double currentEval = minimax(board, depth - 1, alpha, beta, true, children.size()).score;
                 board.undoMove();
 
                 if (currentEval < minEval)
@@ -69,7 +80,7 @@ public class Search {
                     break;
                 }
             }
-            return new String[] {best_move.toString(), String.valueOf(minEval)};
+            return new Node(best_move.toString(), minEval);
         }
     }
 
