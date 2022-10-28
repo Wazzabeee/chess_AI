@@ -90,4 +90,8 @@ public class Search {
     public int getNodesExplored() {
         return nodesExplored;
     }
+    public void resetNodesExplored()
+    {
+        nodesExplored = 0;
+    }
 }

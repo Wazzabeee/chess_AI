@@ -82,11 +82,12 @@ public class UCI {
         // If AI plays white : true else black
         Search s = new Search();
         Instant start = Instant.now();
-        Search.Node answer = s.minimax(board, 5, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 24);
+        Search.Node answer = s.minimax(board, 3, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 24);
         Instant finish = Instant.now();
         System.out.println(Duration.between(start, finish).toMillis());   //in millis
         System.out.println("bestmove " + answer.move);
-        System.out.println(s.getNodesExplored());
+        System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms | " + s.getNodesExplored() + " nodes explored" );
+        s.resetNodesExplored();
 
     }
 }
