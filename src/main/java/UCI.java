@@ -1,3 +1,5 @@
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Side;
@@ -79,7 +81,10 @@ public class UCI {
         // Player to maximize :
         // If AI plays white : true else black
         Search s = new Search();
-        String[] answer = s.minimax(board, 4, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
+        Instant start = Instant.now();
+        String[] answer = s.minimax(board, 4, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 24);
+        Instant finish = Instant.now();
+        System.out.println(Duration.between(start, finish).toMillis());   //in millis
         System.out.println("bestmove " + answer[0]);
         System.out.println(s.getNodesExplored());
 
