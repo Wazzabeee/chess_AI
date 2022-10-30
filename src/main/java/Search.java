@@ -27,7 +27,7 @@ public class Search {
     {
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) // if trivial case
         {
-            return new Node("None", Evaluator.scoresFromFen(board, board.getFen(), numberOfMoves, playerToMaximize));
+            return new Node("None", Evaluator.scoresFromFen(board, numberOfMoves, playerToMaximize));
         }
 
         List<Move> children = board.legalMoves(); // generate all children from current board state

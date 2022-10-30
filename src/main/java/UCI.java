@@ -81,12 +81,13 @@ public class UCI {
         // Player to maximize :
         // If AI plays white : true else black
         Search s = new Search();
+        int depth = 4;
         Instant start = Instant.now();
-        Search.Node answer = s.minimax(board, 3, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 24);
+        Search.Node answer = s.minimax(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
         Instant finish = Instant.now();
-        System.out.println(Duration.between(start, finish).toMillis());   //in millis
+
         System.out.println("bestmove " + answer.move);
-        System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms | " + s.getNodesExplored() + " nodes explored" );
+        System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms | " + s.getNodesExplored() + " nodes explored | depth = " + depth );
         s.resetNodesExplored();
 
     }
