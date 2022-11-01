@@ -1,3 +1,5 @@
+/* Evaluation Class. */
+
 import com.github.bhlangonijr.chesslib.*;
 
 import static java.lang.Long.bitCount;

@@ -1,6 +1,10 @@
+/* UCI Protocol Class. */
+
 import java.time.Duration;
 import java.time.Instant;
+
 import java.util.*;
+
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Side;
 
