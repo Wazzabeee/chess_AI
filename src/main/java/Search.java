@@ -1,8 +1,10 @@
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.Piece;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -31,8 +33,9 @@ public class Search {
         }
 
         List<Move> children = board.legalMoves(); // generate all children from current board state
-        int randomNum = new Random().nextInt(children.size()); // generate a random number in [0; children.size-1]
-        Move best_move = children.get(randomNum); // select random move from children
+        children.sort(Comparator.comparingInt((Move m) -> (int) getMoveScore(board, m)));
+        Collections.reverse(children);
+        Move best_move = children.get(0); // select best move from children*/
 
         if (playerToMaximize)
         {
@@ -83,7 +86,19 @@ public class Search {
             return new Node(best_move.toString(), minEval);
         }
     }
+    public static long getMoveScore(Board b, Move move)
+    {
+        Piece attackedPiece = b.getPiece(move.getTo());
+        Piece attackingPiece = b.getPiece(move.getFrom());
 
+        if (attackedPiece != Piece.NONE)
+            return Evaluator.getPieceStaticValue(attackedPiece);
+        if (move.getPromotion() != Piece.NONE)
+            return Evaluator.getPieceStaticValue(move.getPromotion());
+
+        return Evaluator.getSquareStaticValue(attackingPiece, move.getTo());
+
+    }
     private static void incrementNodesCount() {
         nodesExplored++;
     }

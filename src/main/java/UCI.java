@@ -81,7 +81,7 @@ public class UCI {
         // Player to maximize :
         // If AI plays white : true else black
         Search s = new Search();
-        int depth = 4;
+        int depth = 5;
         Instant start = Instant.now();
         Search.Node answer = s.minimax(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
         Instant finish = Instant.now();
