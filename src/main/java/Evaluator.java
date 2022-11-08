@@ -125,9 +125,9 @@ public class Evaluator {
         long materialOtherSide = scoreMaterial(b, Side.BLACK);
         long scorePieceSquares = scorePieceSquare(b);
 
-        int m = (white) ? lastPlayerMoves : b.legalMoves().size();
-        int M = (white) ? b.legalMoves().size() : lastPlayerMoves;
-        return (materialSide - materialOtherSide) + scorePieceSquares + (M - m);
+        /*int m = (white) ? lastPlayerMoves : b.legalMoves().size();
+        int M = (white) ? b.legalMoves().size() : lastPlayerMoves;*/
+        return (materialSide - materialOtherSide) + scorePieceSquares; //+ (M - m);
     }
 
     public static long getPieceStaticValue(Piece p)

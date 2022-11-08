@@ -84,15 +84,28 @@ public class UCI {
         //search for move
         // Player to maximize :
         // If AI plays white : true else black
-        Search s = new Search();
         int depth = 5;
+
+        //Search s = new Search();
+        //Instant start = Instant.now();
+        //Search.Answer answer = s.minimax(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
+        //Instant finish = Instant.now();
+
+        //System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms | " + s.getNodesExplored() + " nodes explored | depth = " + depth );
+        //s.resetNodesExplored();
+
+        /*Node root = new Node(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE);
         Instant start = Instant.now();
-        Search.Node answer = s.minimax(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, 20);
+        root.call();
+        Instant finish = Instant.now();*/
+        
+        Instant start = Instant.now();
+        LeftSideNode root = new LeftSideNode(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE);
+        root.PVS();
         Instant finish = Instant.now();
 
-        System.out.println("bestmove " + answer.move);
-        System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms | " + s.getNodesExplored() + " nodes explored | depth = " + depth );
-        s.resetNodesExplored();
-
+        //System.out.println("bestmove " + answer.move);
+        System.out.println("bestmove " + root.getBestMove());
+        System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + root.getNodesExplored() + " nodes explored | depth = " + depth );
     }
 }
