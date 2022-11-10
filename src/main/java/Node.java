@@ -13,28 +13,37 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class Node implements Callable<Result> {
+
+    private String name;
     
     private Board board;
     private Integer depth;
     private Boolean playerToMaximize;
     private LeftSideNode parent;
+    private double alpha;
+    private double beta;
 
-    private Move bestMove;
+    private Move move;
     private Integer nodesExplored;
 
-    public Node(Board board, Integer depth, Boolean playerToMaximise, Move bestMove, LeftSideNode parent) {
+    public Node(Board board, Integer depth, Boolean playerToMaximise, Move move, LeftSideNode parent) {
         this.board = board.clone();
         this.depth = depth;
         this.playerToMaximize = playerToMaximise;
         this.nodesExplored = 0;
-        this.bestMove = bestMove;
+        this.move = move;
         this.parent = parent;
+
+        this.alpha = this.parent.getAlpha();
+        this.beta = this.parent.getBeta();
+
+        this.name = this.move.toString();
     }
 
-    public Double alphaBetaCutOff(Board board, Integer depth, Boolean playerToMaximize, Integer numberOfMoves) {
+    public Result alphaBetaCutOff(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
         // Cas Trivial
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) {
-            return Evaluator.scoresFromFen(board, numberOfMoves, playerToMaximize);
+            return new Result(Evaluator.scoresFromFen(board), null, 0);
         } 
 
         // Génère la liste des mouvements possibles
@@ -44,60 +53,52 @@ public class Node implements Callable<Result> {
         children.sort(Comparator.comparingInt((Move m) -> (int) getMoveScore(board, m)));
         Collections.reverse(children);
 
+        Move bestMove = children.get(0);
+
         if (playerToMaximize) {
-            Double maxEval = null;
+            Double maxEval = alpha;
+
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, !playerToMaximize, children.size());
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, !playerToMaximize).getNum();
                 board.undoMove();
 
-                // Compare currentEval with maxEval and alpha beta prunnings
-                maxEval = this.parent.getScore();
                 if (maxEval < currentEval) {
-                    this.parent.setScore(currentEval, this.bestMove);
+                    maxEval = currentEval;
+                    bestMove = move;
                 }
 
-                /*if (this.parent.getAlpha() < maxEval) {
-                    this.parent.setAlpha(maxEval);
-                    break;
-                }*/
-                
+                alpha = max(alpha, maxEval);
 
-                this.parent.setAlpha(max(this.parent.getAlpha(), maxEval));
-
-                if (this.parent.getBeta() <= this.parent.getAlpha()) {
+                if (beta <= alpha) {
                     break;
                 }
             }
 
-            return maxEval;
+            return new Result(maxEval, bestMove, this.nodesExplored);
         } else {
-            Double minEval = null;
+            Double minEval = beta;
+
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, !playerToMaximize, children.size());
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, !playerToMaximize).getNum();
                 board.undoMove();
 
-                minEval = this.parent.getScore();
                 if (currentEval < minEval) {
-                    this.parent.setScore(currentEval, this.bestMove);
-                };
+                    minEval = currentEval;
+                    bestMove = move;
+                }
 
-                /*if (minEval < this.parent.getBeta()) {
-                    this.parent.setBeta(minEval);
-                    break;
-                }*/
+                beta = min(beta, minEval);
 
-                this.parent.setBeta(min(this.parent.getBeta(), minEval));
-
-                if (this.parent.getBeta() <= this.parent.getAlpha()) {
+                if (beta <= alpha) {
                     break;
                 }
             }
 
-            return minEval;
+            return new Result(minEval, bestMove, this.nodesExplored);
         }
     }
 
@@ -115,14 +116,6 @@ public class Node implements Callable<Result> {
 
     }
 
-    /*public String getBestMove() {
-        String ans = this.bestMove.toString();
-        if (ans == null) {
-            return " ";
-        }
-        return this.bestMove.toString();
-    }*/
-
     private void incrementNodesCount() {
         this.nodesExplored++;
     }
@@ -133,8 +126,10 @@ public class Node implements Callable<Result> {
 
     @Override
     public Result call() {
-        Double num = this.alphaBetaCutOff(board.clone(), this.depth, this.playerToMaximize, 20);
+        Result r = this.alphaBetaCutOff(this.board, this.depth, this.alpha, this.beta, this.playerToMaximize);
 
-        return new Result(num, this.bestMove, this.nodesExplored);
+        //System.out.println("Node : " + this.name + " | score : " + r.getNum());
+
+        return new Result(r.getNum(), this.move, this.nodesExplored);
     }
 }

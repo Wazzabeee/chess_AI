@@ -3,13 +3,13 @@ import com.github.bhlangonijr.chesslib.move.Move;
 public class Result {
     
     private Double num;
-    // private Move bestMove;
+    private Move bestMove;
 
     private Integer nodeExplored;
 
     public Result(Double num, Move bestMove, Integer nodeExplored) {
         this.num = num;
-        //this.bestMove = bestMove;
+        this.bestMove = bestMove;
         this.nodeExplored = nodeExplored;
     }
 
@@ -17,9 +17,9 @@ public class Result {
         return num;
     }
 
-    /*public Move getBestMove() {
+    public Move getBestMove() {
         return bestMove;
-    }*/
+    }
 
     public Integer getNodeExplored() {
         return nodeExplored;

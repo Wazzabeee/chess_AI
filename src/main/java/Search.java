@@ -14,12 +14,17 @@ import static java.lang.Math.min;
 public class Search {
 
     public static class Answer{
-        protected String move;
+        protected Move move;
         protected double score;
+        protected double alpha;
+        protected double beta;
+        protected int nodesExplored;
 
-        public Answer(String move, double score){
+        public Answer(Move move, double score, double alpha, double beta){
             this.move = move;
             this.score = score;
+            this.alpha = alpha;
+            this.beta = beta;
         }
     }
 
@@ -27,7 +32,7 @@ public class Search {
     public Answer minimax(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize, Integer numberOfMoves) {
         // Cas Terminal
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) {
-            return new Answer(null, Evaluator.scoresFromFen(board, numberOfMoves, playerToMaximize));
+            return new Answer(null, Evaluator.scoresFromFen(board), alpha, beta);
         }
 
         // Génère la liste des mouvements possibles
@@ -62,7 +67,7 @@ public class Search {
                 }
             }
 
-            return new Answer(best_move.toString(), maxEval);
+            return new Answer(best_move, maxEval, alpha, beta);
         } else {
             double minEval = Double.MAX_VALUE;
             for (Move move : children) {
@@ -83,7 +88,7 @@ public class Search {
                 }
             }
 
-            return new Answer(best_move.toString(), minEval);
+            return new Answer(best_move, minEval, alpha, beta);
         }
     }
 

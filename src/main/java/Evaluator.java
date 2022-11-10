@@ -1,5 +1,3 @@
-/* Evaluation Class. */
-
 import com.github.bhlangonijr.chesslib.*;
 
 import static java.lang.Long.bitCount;
@@ -18,6 +16,7 @@ public class Evaluator {
     private static final long ROOK_VALUE = 500L;
     private static final long QUEEN_VALUE = 900L;
     private static final long MATE_VALUE = 39000L;
+    private static final long MAX_VALUE = 40000L;
 
     private static final long MAX_MATERIAL = PAWN_VALUE * 8 + KNIGHT_VALUE * 2 + BISHOP_VALUE * 2 + ROOK_VALUE * 2 + QUEEN_VALUE;
     private static final short[] PawnTable = new short[]
@@ -51,7 +50,7 @@ public class Evaluator {
                     -10, 0, 10, 10, 10, 10, 0,-10,
                     -10, 10, 10, 10, 10, 10, 10,-10,
                     -10, 5, 0, 0, 0, 0, 5,-10,
-                    -20,-10,-40,-10,-10,-40,-10,-20,
+                    -20,-10,-10,-10,-10,-10,-10,-20,
             };
 
     private static final short[] RookTable = new short[]
@@ -104,30 +103,31 @@ public class Evaluator {
      * Calcule le score des deux joueurs basé sur la valeur des pièces
      *
      * @param b : etat du jeu actuel
-     * @param lastPlayerMoves : nombre de coups disponibles pour le dernier joueur à avoir joué
-     * @param white : vrai si aux blancs de jouer, faux sinon
      * @return double : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
-    public static double scoresFromFen(Board b, Integer lastPlayerMoves, Boolean white)
+    public static double scoresFromFen(Board b)
     {
         if (b.isDraw()) // if draw return 0
         {
             return 0.0;
-        } else if (b.isMated() && white) // if mate and white to play then -inf
+        } else if (b.isMated() && (b.getSideToMove() == Side.WHITE)) // if mate and white to play then -inf
         {
-            return -Double.MAX_VALUE;
-        } else if (b.isMated() && !white) //if mate and black to play then +inf
+            return -MAX_VALUE;
+        } else if (b.isMated() && (b.getSideToMove() != Side.WHITE)) //if mate and black to play then +inf
         {
-            return Double.MAX_VALUE;
+            return MAX_VALUE;
         }
 
         long materialSide = scoreMaterial(b, Side.WHITE);
         long materialOtherSide = scoreMaterial(b, Side.BLACK);
         long scorePieceSquares = scorePieceSquare(b);
 
-        /*int m = (white) ? lastPlayerMoves : b.legalMoves().size();
-        int M = (white) ? b.legalMoves().size() : lastPlayerMoves;*/
-        return (materialSide - materialOtherSide) + scorePieceSquares; //+ (M - m);
+        //int m = (white) ? lastPlayerMoves : b.legalMoves().size();
+        //int M = (white) ? b.legalMoves().size() : lastPlayerMoves;
+        //final boolean isCastle = context.isCastleMove(move);
+        //return (materialSide - materialOtherSide) + scorePieceSquares + (M - m);
+        return (materialSide - materialOtherSide) + scorePieceSquares;
+
     }
 
     public static long getPieceStaticValue(Piece p)
@@ -173,7 +173,6 @@ public class Evaluator {
             }
             case QUEEN -> {
                 return QueenTable[getIndex(p.getPieceSide(), s)];
-                //return 0L;
             }
             case KING -> {
                 return KingEndingTable[getIndex(p.getPieceSide(), s)];
