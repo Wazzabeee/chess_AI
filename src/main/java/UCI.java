@@ -80,14 +80,23 @@ public class UCI {
         //search for move
         // Player to maximize :
         // If AI plays white : true else black
-        int depth = 3;
+        int depth = 6;
+
+        Stop stop = new Stop();
         
-        LeftSideNode root = new LeftSideNode(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE);
+        LeftSideNode root = new LeftSideNode(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, stop);
+        Timer timer = new Timer(root, stop);
+        timer.start();
         Instant start = Instant.now();
         Result r = root.PVS();
         Instant finish = Instant.now();
+        timer.interrupt();
 
-        System.out.println("bestmove " + r.getBestMove());
-        System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
+        if (!stop.getStop()) {
+            System.out.println("bestmove " + r.getBestMove());
+            System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
+        }
+
+        stop.setTrueStop();
     }
 }

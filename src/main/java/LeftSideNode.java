@@ -8,10 +8,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.move.Move;
+
+import static java.lang.Math.min;
 
 public class LeftSideNode {
     
@@ -24,10 +27,17 @@ public class LeftSideNode {
     private Double score;
 
     private Move bestMove;
+    private Stop stop;
 
     private List<Move> children;
 
-    public LeftSideNode(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximise) {
+    private ExecutorService executor;
+
+    private Boolean isActive;
+    private LeftSideNode fils;
+
+    public LeftSideNode(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximise, Stop stop) {
+        this.stop = stop;
         this.board = board;
         this.depth = depth;
         this.playerToMaximize = playerToMaximise;
@@ -42,6 +52,8 @@ public class LeftSideNode {
 
         // Meilleur Move
         this.bestMove = this.children.get(0);
+        this.isActive = false;
+        this.fils = null;
     }
 
     public Result PVS() {
@@ -58,51 +70,57 @@ public class LeftSideNode {
         // On trouve le noeud le plus à gauche
         this.incrementNodesCount(1);
         this.board.doMove(this.bestMove);
-        LeftSideNode fils = new LeftSideNode(this.board, this.depth - 1, this.alpha, this.beta, !this.playerToMaximize);
+        LeftSideNode fils = new LeftSideNode(this.board, this.depth - 1, this.alpha, this.beta, !this.playerToMaximize, this.stop);
+        this.fils = fils;
+        this.isActive = true;
         Result r = fils.PVS();
         this.score = r.getNum();
         this.incrementNodesCount(r.getNodeExplored());;
         this.board.undoMove();
 
-        // Crée une pool de (18) Thread
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+        // Crée une pool de (15) Thread
+        this.executor = Executors.newFixedThreadPool(min(15, this.children.size() - 1));
         List<Future<Result>> resultList = new ArrayList<Future<Result>>();
-
-        // Chacun des noeuds va exécuter Alpha Beta Cut Off
-        for (Move m : this.children.subList(1, this.children.size())) {
-            this.incrementNodesCount(1);
-            board.doMove(m);
-            Node n = new Node(this.board, this.depth - 1, !this.playerToMaximize, m, this);
-            board.undoMove();
-            resultList.add(executor.submit(n));
-        }
-
-        // Attendre que tous les Nodes donnent un résultat
-        executor.shutdown();
         
-        for (Future<Result> future : resultList) {
-            try {     
-                r = future.get(); 
+        if (!this.stop.getStop()) {
+            // Chacun des noeuds va exécuter Alpha Beta Cut Off
+            for (Move m : this.children.subList(1, this.children.size())) {
+                this.incrementNodesCount(1);
+                board.doMove(m);
+                Node n = new Node(this.board, this.depth - 1, !this.playerToMaximize, m, this);
+                board.undoMove();
+                resultList.add(this.executor.submit(n));
+            }
 
-                this.incrementNodesCount(r.getNodeExplored());
+            // Attendre que tous les Nodes donnent un résultat
+            try { 
+                this.executor.awaitTermination(1, TimeUnit.SECONDS);
+            
+                for (Future<Result> future : resultList) {    
+                    r = future.get(); 
 
-                if (playerToMaximize) {
-                    if (this.score < r.getNum()) {
-                        this.score = r.getNum();
-                        this.bestMove = r.getBestMove();
-                    }
-                } else {
-                    if (r.getNum() < this.score){
-                        this.score = r.getNum();
-                        this.bestMove = r.getBestMove();
+                    this.incrementNodesCount(r.getNodeExplored());
+
+                    if (playerToMaximize) {
+                        if (this.score < r.getNum()) {
+                            this.score = r.getNum();
+                            this.bestMove = r.getBestMove();
+                        }
+                    } else {
+                        if (r.getNum() < this.score){
+                            this.score = r.getNum();
+                            this.bestMove = r.getBestMove();
+                        }
                     }
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
+                
+            //System.out.println("Final bestMove : " + this.bestMove + " | score : " + this.score);
         }
-            
-        //System.out.println("Final bestMove : " + this.bestMove + " | score : " + this.score);
+
+        this.isActive = false;
 
         return new Result(this.score, this.bestMove, this.nodesExplored);
     }
@@ -135,5 +153,22 @@ public class LeftSideNode {
     public String getNodesExplored() {
         Integer a = this.nodesExplored + this.depth;
         return a.toString();
+    }
+
+    public Move getBestMove() {
+        return this.bestMove;
+    }
+
+    public boolean isActive() {
+        return this.isActive;
+    }
+
+    public void stopAllThread() {
+        if (this.fils.isActive()) {
+            this.fils.stopAllThread();
+        }
+        if (this.executor != null && this.isActive) {
+            this.executor.shutdownNow();
+        }
     }
 }

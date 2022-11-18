@@ -14,7 +14,7 @@ import static java.lang.Math.min;
 
 public class Node implements Callable<Result> {
 
-    private String name;
+    // private String name;
     
     private Board board;
     private Integer depth;
@@ -37,7 +37,7 @@ public class Node implements Callable<Result> {
         this.alpha = this.parent.getAlpha();
         this.beta = this.parent.getBeta();
 
-        this.name = this.move.toString();
+        // this.name = this.move.toString();
     }
 
     public Result alphaBetaCutOff(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
