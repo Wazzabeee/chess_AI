@@ -88,15 +88,18 @@ public class UCI {
         Timer timer = new Timer(root, stop);
         timer.start();
         Instant start = Instant.now();
+        System.out.println("LeftSideNode depth : " + depth + " start");
         Result r = root.PVS();
+        System.out.println("LeftSideNode depth : " + depth + " stop");
         Instant finish = Instant.now();
-        timer.interrupt();
 
         if (!stop.getStop()) {
-            System.out.println("bestmove " + r.getBestMove());
-            System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
+            System.out.println("Timer stop");
+            stop.setTrueStop();
+            timer.interrupt();
         }
 
-        stop.setTrueStop();
+        System.out.println("bestmove " + r.getBestMove());
+        System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
     }
 }
