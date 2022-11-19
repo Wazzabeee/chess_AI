@@ -80,7 +80,7 @@ public class UCI {
         //search for move
         // Player to maximize :
         // If AI plays white : true else black
-        int depth = 6;
+        int depth = 7;
 
         Stop stop = new Stop();
         
@@ -88,13 +88,13 @@ public class UCI {
         Timer timer = new Timer(root, stop);
         timer.start();
         Instant start = Instant.now();
-        System.out.println("LeftSideNode depth : " + depth + " start");
+        //System.out.println("LeftSideNode depth : " + depth + " start");
         Result r = root.PVS();
-        System.out.println("LeftSideNode depth : " + depth + " stop");
+        //System.out.println("LeftSideNode depth : " + depth + " stop");
         Instant finish = Instant.now();
 
         if (!stop.getStop()) {
-            System.out.println("Timer stop");
+            //System.out.println("Timer stop");
             stop.setTrueStop();
             timer.interrupt();
         }

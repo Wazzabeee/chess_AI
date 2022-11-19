@@ -51,7 +51,12 @@ public class LeftSideNode {
         Collections.reverse(this.children);
 
         // Meilleur Move
-        this.bestMove = this.children.get(0);
+        try {
+            this.bestMove = this.children.get(0);
+        }
+        catch (Exception e) {
+        }
+
         this.isActive = false;
         this.fils = null;
     }
@@ -73,9 +78,9 @@ public class LeftSideNode {
         LeftSideNode fils = new LeftSideNode(this.board, this.depth - 1, this.alpha, this.beta, !this.playerToMaximize, this.stop);
         this.fils = fils;
 
-        System.out.println("LeftSideNode depth : " + (this.depth - 1) + " start");
+        //System.out.println("LeftSideNode depth : " + (this.depth - 1) + " start");
         Result r = fils.PVS();
-        System.out.println("LeftSideNode depth : " + (this.depth - 1) + " stop");
+        //System.out.println("LeftSideNode depth : " + (this.depth - 1) + " stop");
 
         this.score = r.getNum();
         this.incrementNodesCount(r.getNodeExplored());;
@@ -101,39 +106,39 @@ public class LeftSideNode {
             if (this.isActive()) {
                 resultList.add(this.executor.submit(n));
             } else {
-                if (this.depth == 6) {
-                    System.out.println("New Move Stop");
-                }
+                //if (this.depth == 5) {
+                //    System.out.println("New Move Stop");
+                //}
 
                 break;
             }
         }
 
         if (this.isActive()) {
-            if (this.depth == 6) {
-                System.out.println("Shutdown start");
-            }
+            //if (this.depth == 5) {
+            //    System.out.println("Shutdown start");
+            //}
 
             // Attendre que tous les Nodes donnent un résultat
             this.executor.shutdown();
 
-            if (this.depth == 6) {
-                System.out.println("Shutdown finish");
-            }
+            //if (this.depth == 5) {
+            //    System.out.println("Shutdown finish");
+            //}
         } 
 
         if (!this.isActive()) {
-            if (this.depth == 6) {
-                System.out.println("Process stopped before aggregation");
-            }
+            //if (this.depth == 5) {
+            //    System.out.println("Process stopped before aggregation");
+            //}
 
             return new Result(this.score, this.bestMove, this.nodesExplored);
         }
 
-        if (this.depth == 6) {
-            System.out.println("Aggregation Start");
-            System.out.println(resultList.size());
-        }
+        //if (this.depth == 5) {
+        //    System.out.println("Aggregation Start");
+        //    System.out.println(resultList.size());
+        //}
 
         try { 
             //if (!this.executor.isShutdown()) {
@@ -147,9 +152,9 @@ public class LeftSideNode {
 
                 r = future.get(); 
 
-                if (this.depth == 6) {
-                    System.out.println(r);
-                }
+                //if (this.depth == 5) {
+                //    System.out.println(r);
+                //}
 
                 this.incrementNodesCount(r.getNodeExplored());
 
@@ -171,17 +176,17 @@ public class LeftSideNode {
             e.printStackTrace();
         }
 
-        if (this.depth == 6) {
-            System.out.println("Aggregation Finish");
-        }
+        //if (this.depth == 5) {
+        //    System.out.println("Aggregation Finish");
+        //}
                 
         //System.out.println("Final bestMove : " + this.bestMove + " | score : " + this.score);
 
         this.isActive = false;
 
-        if (this.depth == 6) {
-            System.out.println("Process finished");
-        }
+        //if (this.depth == 5) {
+        //    System.out.println("Process finished");
+        //}
 
         return new Result(this.score, this.bestMove, this.nodesExplored);
     }
@@ -233,7 +238,7 @@ public class LeftSideNode {
             this.isActive = false;
             this.executor.shutdownNow();
 
-            System.out.println("LeftSideNode depth " + this.depth + " interrupted");
+            //System.out.println("LeftSideNode depth " + this.depth + " interrupted");
         }
     }
 }

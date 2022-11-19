@@ -43,6 +43,7 @@ public class Node implements Callable<Result> {
     public Result alphaBetaCutOff(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
         // Cas Trivial
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) {
+            //return new Result(TapEvaluation.eval(board), null, 0);
             return new Result(Evaluator.scoresFromFen(board), null, 0);
         } 
 

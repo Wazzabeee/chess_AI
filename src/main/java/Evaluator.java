@@ -132,55 +132,41 @@ public class Evaluator {
 
     public static long getPieceStaticValue(Piece p)
     {
-        switch (p.getPieceType()) {
-            case PAWN -> {
-                return PAWN_VALUE;
-            }
-            case KNIGHT -> {
-                return KNIGHT_VALUE;
-            }
-            case BISHOP -> {
-                return BISHOP_VALUE;
-            }
-            case ROOK -> {
-                return ROOK_VALUE;
-            }
-            case QUEEN -> {
-                return QUEEN_VALUE;
-            }
-            case KING -> {
-                return MATE_VALUE;
-            }
-            default -> {
-                return 0L;
-            }
-        }
+        PieceType pt = p.getPieceType();
+
+        if(pt == PieceType.PAWN)
+            return PAWN_VALUE;
+        if(pt == PieceType.KNIGHT)
+            return KNIGHT_VALUE;
+        if(pt == PieceType.BISHOP)
+            return BISHOP_VALUE;
+        if(pt == PieceType.ROOK)
+            return ROOK_VALUE;
+        if(pt == PieceType.QUEEN)
+            return QUEEN_VALUE;
+        if(pt == PieceType.KING)
+            return MAX_VALUE;
+
+        return 0L;
     }
     public static long getSquareStaticValue(Piece p, Square s)
     {
-        switch (p.getPieceType()) {
-            case PAWN -> {
-                return PawnTable[getIndex(p.getPieceSide(), s)];
-            }
-            case KNIGHT -> {
-                return KnightTable[getIndex(p.getPieceSide(), s)];
-            }
-            case BISHOP -> {
-                return BishopTable[getIndex(p.getPieceSide(), s)];
-            }
-            case ROOK -> {
-                return RookTable[getIndex(p.getPieceSide(), s)];
-            }
-            case QUEEN -> {
-                return QueenTable[getIndex(p.getPieceSide(), s)];
-            }
-            case KING -> {
-                return KingEndingTable[getIndex(p.getPieceSide(), s)];
-            }
-            default -> {
-                return 0L;
-            }
-        }
+        PieceType pt = p.getPieceType();
+
+        if(pt == PieceType.PAWN)
+            return PawnTable[getIndex(p.getPieceSide(), s)];
+        if(pt == PieceType.KNIGHT)
+            return KnightTable[getIndex(p.getPieceSide(), s)];
+        if(pt == PieceType.BISHOP)
+            return BishopTable[getIndex(p.getPieceSide(), s)];
+        if(pt == PieceType.ROOK)
+            return RookTable[getIndex(p.getPieceSide(), s)];
+        if(pt == PieceType.QUEEN)
+            return QueenTable[getIndex(p.getPieceSide(), s)];
+        if(pt == PieceType.KING)
+            return KingEndingTable[getIndex(p.getPieceSide(), s)];
+
+        return 0L;
     }
 
     private static long scoreMaterial(Board b, Side s) {
