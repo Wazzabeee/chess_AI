@@ -7,11 +7,12 @@ import java.util.*;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Side;
+import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
     static String ENGINENAME="IA_v0.1";
-
+    static Boolean continueOpening = true;
     public static void uciCommunication() {
         Scanner input = new Scanner(System.in);
 
@@ -81,14 +82,9 @@ public class UCI {
         }
     } 
 
-    public static void inputGo(Board board) {
-        //search for move
-        // Player to maximize :
-        // If AI plays white : true else black
-        int depth = 5;
-
+    public static void search(Board board, int depth) {
         Stop stop = new Stop();
-        
+
         LeftSideNode root = new LeftSideNode(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, stop);
         Timer timer = new Timer(root, stop);
         timer.start();
@@ -103,5 +99,30 @@ public class UCI {
 
         System.out.println("bestmove " + r.getBestMove());
         System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
+    }
+    public static void inputGo(Board board) {
+        //search for move
+        // Player to maximize :
+        // If AI plays white : true else black
+        int depth = 5;
+        if(continueOpening) {
+            Instant start = Instant.now();
+            readBook rb = new readBook();
+            Move move = rb.getMove(board);
+
+            if (move == null) {
+                continueOpening = false;
+                System.out.println("fin de l'opening");
+                search(board, depth);
+            }
+            else {
+                Instant finish = Instant.now();
+                System.out.println("bestmove " + move);
+                System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms");
+            }
+
+        }
+        else
+            search(board, depth);
     }
 }
