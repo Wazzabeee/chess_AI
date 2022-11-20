@@ -12,15 +12,11 @@ public class Timer extends Thread {
         try {
             Thread.sleep(1000);
 
-            System.out.println("Sleep finish");
-
             if (!this.stop.getStop()) {
                 this.stop.setTrueStop();
                 this.lsn.stopAllThread();
-                // System.out.println("bestmove " + this.lsn.getBestMove().toString());
             }
         } catch (InterruptedException e) {
-            System.out.println("Timer interupted");
             e.printStackTrace();
         }
     }

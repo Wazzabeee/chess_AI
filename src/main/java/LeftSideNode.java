@@ -54,9 +54,7 @@ public class LeftSideNode {
         try {
             this.bestMove = this.children.get(0);
         }
-        catch (Exception e) {
-        }
-
+        catch (Exception e) {}
         this.isActive = false;
         this.fils = null;
     }
@@ -66,9 +64,6 @@ public class LeftSideNode {
         if (this.depth == 3 || this.board.isDraw() || this.board.isMated() || this.board.isStaleMate()){
             Node n = new Node(this.board, this.depth, this.playerToMaximize, this.bestMove, this);
             Result r = n.alphaBetaCutOff(this.board, this.depth, this.alpha, this.beta, playerToMaximize);
-
-            //System.out.println("First move : " + r.getBestMove().toString() + " | score : " + r.getNum());
-
             return r;
         }
 
@@ -78,9 +73,7 @@ public class LeftSideNode {
         LeftSideNode fils = new LeftSideNode(this.board, this.depth - 1, this.alpha, this.beta, !this.playerToMaximize, this.stop);
         this.fils = fils;
 
-        //System.out.println("LeftSideNode depth : " + (this.depth - 1) + " start");
         Result r = fils.PVS();
-        //System.out.println("LeftSideNode depth : " + (this.depth - 1) + " stop");
 
         this.score = r.getNum();
         this.incrementNodesCount(r.getNodeExplored());;
@@ -106,39 +99,18 @@ public class LeftSideNode {
             if (this.isActive()) {
                 resultList.add(this.executor.submit(n));
             } else {
-                //if (this.depth == 5) {
-                //    System.out.println("New Move Stop");
-                //}
-
                 break;
             }
         }
 
         if (this.isActive()) {
-            //if (this.depth == 5) {
-            //    System.out.println("Shutdown start");
-            //}
-
             // Attendre que tous les Nodes donnent un résultat
             this.executor.shutdown();
-
-            //if (this.depth == 5) {
-            //    System.out.println("Shutdown finish");
-            //}
         } 
 
         if (!this.isActive()) {
-            //if (this.depth == 5) {
-            //    System.out.println("Process stopped before aggregation");
-            //}
-
             return new Result(this.score, this.bestMove, this.nodesExplored);
         }
-
-        //if (this.depth == 5) {
-        //    System.out.println("Aggregation Start");
-        //    System.out.println(resultList.size());
-        //}
 
         try { 
             //if (!this.executor.isShutdown()) {
@@ -150,11 +122,7 @@ public class LeftSideNode {
                     break;
                 }
 
-                r = future.get(); 
-
-                //if (this.depth == 5) {
-                //    System.out.println(r);
-                //}
+                r = future.get();
 
                 this.incrementNodesCount(r.getNodeExplored());
 
@@ -175,18 +143,7 @@ public class LeftSideNode {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        //if (this.depth == 5) {
-        //    System.out.println("Aggregation Finish");
-        //}
-                
-        //System.out.println("Final bestMove : " + this.bestMove + " | score : " + this.score);
-
         this.isActive = false;
-
-        //if (this.depth == 5) {
-        //    System.out.println("Process finished");
-        //}
 
         return new Result(this.score, this.bestMove, this.nodesExplored);
     }
@@ -237,8 +194,6 @@ public class LeftSideNode {
         if (this.isActive) {
             this.isActive = false;
             this.executor.shutdownNow();
-
-            //System.out.println("LeftSideNode depth " + this.depth + " interrupted");
         }
     }
 }
