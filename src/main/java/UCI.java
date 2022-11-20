@@ -12,7 +12,7 @@ import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
     static String ENGINENAME="IA_v0.1";
-    static Boolean continueOpening = true;
+    private static boolean continueOpening = true;
     public static void uciCommunication() {
         Scanner input = new Scanner(System.in);
 
@@ -27,6 +27,7 @@ public class UCI {
             } else if ("isready".equals(inputString)) {
                 inputIsReady();
             } else if ("ucinewgame".equals(inputString)) {
+                continueOpening = true;
                 inputUCINewGame(board);
             } else if (inputString.startsWith("position")) {
                 //System.out.println("postion recognized");
