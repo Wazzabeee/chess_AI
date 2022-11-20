@@ -2,10 +2,10 @@ import com.github.bhlangonijr.chesslib.move.Move;
 
 public class Result {
     
-    private Double num;
-    private Move bestMove;
+    private final Double num;
+    private final Move bestMove;
 
-    private Integer nodeExplored;
+    private final Integer nodeExplored;
 
     public Result(Double num, Move bestMove, Integer nodeExplored) {
         this.num = num;

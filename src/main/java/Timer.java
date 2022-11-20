@@ -1,7 +1,7 @@
 public class Timer extends Thread {
 
-    private LeftSideNode lsn;
-    private Stop stop;
+    private final LeftSideNode lsn;
+    private final Stop stop;
 
     public Timer(LeftSideNode lsn, Stop stop) {
         this.lsn = lsn;

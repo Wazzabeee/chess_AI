@@ -16,14 +16,13 @@ public class Node implements Callable<Result> {
 
     // private String name;
     
-    private Board board;
-    private Integer depth;
-    private Boolean playerToMaximize;
-    private LeftSideNode parent;
-    private double alpha;
-    private double beta;
+    private final Board board;
+    private final Integer depth;
+    private final Boolean playerToMaximize;
+    private final double alpha;
+    private final double beta;
 
-    private Move move;
+    private final Move move;
     private Integer nodesExplored;
 
     public Node(Board board, Integer depth, Boolean playerToMaximise, Move move, LeftSideNode parent) {
@@ -32,10 +31,9 @@ public class Node implements Callable<Result> {
         this.playerToMaximize = playerToMaximise;
         this.nodesExplored = 0;
         this.move = move;
-        this.parent = parent;
 
-        this.alpha = this.parent.getAlpha();
-        this.beta = this.parent.getBeta();
+        this.alpha = parent.getAlpha();
+        this.beta = parent.getBeta();
 
         // this.name = this.move.toString();
     }
@@ -61,7 +59,7 @@ public class Node implements Callable<Result> {
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, !playerToMaximize).getNum();
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, false).getNum();
                 board.undoMove();
 
                 if (maxEval < currentEval) {
@@ -83,7 +81,7 @@ public class Node implements Callable<Result> {
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, !playerToMaximize).getNum();
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, true).getNum();
                 board.undoMove();
 
                 if (currentEval < minEval) {

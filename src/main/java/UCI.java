@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Side;
+import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
     static String ENGINENAME="IA_v0.1";
@@ -66,13 +67,17 @@ public class UCI {
 
         if (input.contains("moves")) {
             input=input.substring(input.indexOf("moves")+6);
+            MoveList list = new MoveList();
+            list.loadFromSan(input);
+            board.loadFromFen(list.getFen());
+            /*input=input.substring(input.indexOf("moves")+6);
             String[] moves = input.split("\\s+");
 
             if (moves.length > 1) {
                 board.doMove(moves[moves.length - 2]);
             }
 
-            board.doMove(moves[moves.length - 1]);
+            board.doMove(moves[moves.length - 1]);*/
         }
     } 
 

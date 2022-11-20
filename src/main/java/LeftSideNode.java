@@ -1,5 +1,9 @@
 /* Basic Node Class. */
 
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.move.Move;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,28 +12,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.move.Move;
 
 import static java.lang.Math.min;
 
 public class LeftSideNode {
     
-    private Board board;
-    private Integer depth;
-    private Double alpha;
-    private Double beta;
-    private Boolean playerToMaximize;
+    private final Board board;
+    private final Integer depth;
+    private final Double alpha;
+    private final Double beta;
+    private final Boolean playerToMaximize;
     private Integer nodesExplored;
-    private Double score;
 
     private Move bestMove;
-    private Stop stop;
+    private final Stop stop;
 
-    private List<Move> children;
+    private final List<Move> children;
 
     private ExecutorService executor;
 
@@ -54,7 +52,7 @@ public class LeftSideNode {
         try {
             this.bestMove = this.children.get(0);
         }
-        catch (Exception e) {}
+        catch (Exception ignored) {}
         this.isActive = false;
         this.fils = null;
     }
@@ -63,8 +61,7 @@ public class LeftSideNode {
         // Node la plus à Gauche
         if (this.depth == 3 || this.board.isDraw() || this.board.isMated() || this.board.isStaleMate()){
             Node n = new Node(this.board, this.depth, this.playerToMaximize, this.bestMove, this);
-            Result r = n.alphaBetaCutOff(this.board, this.depth, this.alpha, this.beta, playerToMaximize);
-            return r;
+            return n.alphaBetaCutOff(this.board, this.depth, this.alpha, this.beta, playerToMaximize);
         }
 
         // On trouve le noeud le plus à gauche
@@ -75,17 +72,17 @@ public class LeftSideNode {
 
         Result r = fils.PVS();
 
-        this.score = r.getNum();
-        this.incrementNodesCount(r.getNodeExplored());;
+        Double score = r.getNum();
+        this.incrementNodesCount(r.getNodeExplored());
         this.board.undoMove();
 
         if (this.stop.getStop() || this.children.size() == 1) {
-            return new Result(this.score, this.bestMove, this.nodesExplored);
+            return new Result(score, this.bestMove, this.nodesExplored);
         }
 
         // Crée une pool de (15) Thread
         this.executor = Executors.newFixedThreadPool(min(15, this.children.size() - 1));
-        List<Future<Result>> resultList = new ArrayList<Future<Result>>();
+        List<Future<Result>> resultList = new ArrayList<>();
 
         this.isActive = true;
         
@@ -109,7 +106,7 @@ public class LeftSideNode {
         } 
 
         if (!this.isActive()) {
-            return new Result(this.score, this.bestMove, this.nodesExplored);
+            return new Result(score, this.bestMove, this.nodesExplored);
         }
 
         try { 
@@ -127,25 +124,23 @@ public class LeftSideNode {
                 this.incrementNodesCount(r.getNodeExplored());
 
                 if (playerToMaximize) {
-                    if (this.score < r.getNum()) {
-                        this.score = r.getNum();
+                    if (score < r.getNum()) {
+                        score = r.getNum();
                         this.bestMove = r.getBestMove();
                     }
                 } else {
-                    if (r.getNum() < this.score){
-                        this.score = r.getNum();
+                    if (r.getNum() < score){
+                        score = r.getNum();
                         this.bestMove = r.getBestMove();
                     }
                 }
             }
-        } catch (InterruptedException  e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         this.isActive = false;
 
-        return new Result(this.score, this.bestMove, this.nodesExplored);
+        return new Result(score, this.bestMove, this.nodesExplored);
     }
 
     private static long getMoveScore(Board b, Move move) {
@@ -174,8 +169,8 @@ public class LeftSideNode {
     }
 
     public String getNodesExplored() {
-        Integer a = this.nodesExplored + this.depth;
-        return a.toString();
+        int a = this.nodesExplored + this.depth;
+        return Integer.toString(a);
     }
 
     public Move getBestMove() {
