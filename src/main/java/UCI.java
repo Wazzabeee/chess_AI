@@ -11,7 +11,7 @@ import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
-    static String ENGINENAME="IA_v0.1";
+    static String ENGINENAME="Wall-E";
     private static boolean continueOpening = true;
     public static void uciCommunication() {
         Scanner input = new Scanner(System.in);
@@ -30,7 +30,6 @@ public class UCI {
                 continueOpening = true;
                 inputUCINewGame(board);
             } else if (inputString.startsWith("position")) {
-                //System.out.println("postion recognized");
                 inputPosition(inputString, board);
             } else if (inputString.startsWith("go")) {
                 inputGo(board);
@@ -64,7 +63,21 @@ public class UCI {
             input=input.substring(9);
         } else if (input.contains("fen")) {
             input=input.substring(4);
-            board.loadFromFen(input);
+
+            int ind = input.indexOf("moves");
+            if (ind == -1)
+                board.loadFromFen(input);
+            else {
+                board.loadFromFen(input.substring(0, ind));
+                input = input.substring(ind);
+                if (input.contains("moves")) {
+                    input=input.substring(input.indexOf("moves")+6);
+                    String[] moves = input.split("\\s+");
+                    for (String move: moves) {
+                        board.doMove(move);
+                    }
+                }
+            }
         }
 
         if (input.contains("moves")) {
@@ -72,14 +85,6 @@ public class UCI {
             MoveList list = new MoveList();
             list.loadFromSan(input);
             board.loadFromFen(list.getFen());
-            /*input=input.substring(input.indexOf("moves")+6);
-            String[] moves = input.split("\\s+");
-
-            if (moves.length > 1) {
-                board.doMove(moves[moves.length - 2]);
-            }
-
-            board.doMove(moves[moves.length - 1]);*/
         }
     } 
 
@@ -102,9 +107,6 @@ public class UCI {
         System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
     }
     public static void inputGo(Board board) {
-        //search for move
-        // Player to maximize :
-        // If AI plays white : true else black
         int depth = 5;
         if(continueOpening) {
             Instant start = Instant.now();
@@ -113,7 +115,6 @@ public class UCI {
 
             if (move == null) {
                 continueOpening = false;
-                System.out.println("fin de l'opening");
                 search(board, depth);
             }
             else {
@@ -121,7 +122,6 @@ public class UCI {
                 System.out.println("bestmove " + move);
                 System.out.println("found in " + Duration.between(start, finish).toMillis() + "ms");
             }
-
         }
         else
             search(board, depth);

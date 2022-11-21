@@ -124,10 +124,8 @@ public class Evaluator {
 
         //int m = (white) ? lastPlayerMoves : b.legalMoves().size();
         //int M = (white) ? b.legalMoves().size() : lastPlayerMoves;
-        //final boolean isCastle = context.isCastleMove(move);
-        //return (materialSide - materialOtherSide) + scorePieceSquares + (M - m);
-        return (materialSide - materialOtherSide) + scorePieceSquares;
 
+        return (materialSide - materialOtherSide) + scorePieceSquares;
     }
 
     public static long getPieceStaticValue(Piece p)

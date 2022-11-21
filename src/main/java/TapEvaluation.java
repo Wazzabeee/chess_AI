@@ -5,7 +5,6 @@ import static java.lang.Long.bitCount;
 public class TapEvaluation {
 
     private static final int PHASE_CONSTANT = 256;
-
     private static final long PAWN_VALUE = 100L;
     private static final long BISHOP_VALUE = 320L;
     private static final long KNIGHT_VALUE = 315L;
@@ -15,9 +14,6 @@ public class TapEvaluation {
     private static final int KNIGHT_PENALTY =  -10;
     private static final int ROOK_PENALTY = -20;
     private static final int NO_PAWNS_PENALTY = -20;
-
-    private static final int TEMPO_BONUS = 10;
-
     private static final int[] KNIGHT_PAWN_ADJUSTMENT =
             {-30, -20, -15, -10, -5, 0, 5, 10, 15};
     private static final int[] ROOK_PAWN_ADJUSTMENT =
@@ -182,7 +178,6 @@ public class TapEvaluation {
 
         return 0L;
     }
-
     private static long calculatePieceSquare(Board b, Side sideToMove) {
 
         long somme = 0L;
@@ -265,5 +260,4 @@ public class TapEvaluation {
                 bitCount(b.getBitboard(Piece.make(s, PieceType.ROOK))) * ROOK_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.QUEEN))) * QUEEN_VALUE);
     }
-
 }
