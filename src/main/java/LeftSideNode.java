@@ -72,8 +72,8 @@ public class LeftSideNode {
 
         Result r = fils.PVS();
 
-        Double score = r.getNum();
-        this.incrementNodesCount(r.getNodeExplored());
+        Double score = r.num();
+        this.incrementNodesCount(r.nodeExplored());
         this.board.undoMove();
 
         if (this.stop.getStop() || this.children.size() == 1) {
@@ -121,17 +121,17 @@ public class LeftSideNode {
 
                 r = future.get();
 
-                this.incrementNodesCount(r.getNodeExplored());
+                this.incrementNodesCount(r.nodeExplored());
 
                 if (playerToMaximize) {
-                    if (score < r.getNum()) {
-                        score = r.getNum();
-                        this.bestMove = r.getBestMove();
+                    if (score < r.num()) {
+                        score = r.num();
+                        this.bestMove = r.bestMove();
                     }
                 } else {
-                    if (r.getNum() < score){
-                        score = r.getNum();
-                        this.bestMove = r.getBestMove();
+                    if (r.num() < score){
+                        score = r.num();
+                        this.bestMove = r.bestMove();
                     }
                 }
             }

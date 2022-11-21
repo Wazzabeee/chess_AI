@@ -161,22 +161,29 @@ public class TapEvaluation {
 
     public static long getSquareStaticValue(Piece p, Square s)
     {
-        PieceType pt = p.getPieceType();
-
-        if(pt == PieceType.PAWN)
-            return PawnTable[getIndex(p.getPieceSide(), s)];
-        if(pt == PieceType.KNIGHT)
-            return KnightTable[getIndex(p.getPieceSide(), s)];
-        if(pt == PieceType.BISHOP)
-            return BishopTable[getIndex(p.getPieceSide(), s)];
-        if(pt == PieceType.ROOK)
-            return RookTable[getIndex(p.getPieceSide(), s)];
-        if(pt == PieceType.QUEEN)
-            return QueenTable[getIndex(p.getPieceSide(), s)];
-        if(pt == PieceType.KING)
-            return KingEndingTable[getIndex(p.getPieceSide(), s)];
-
-        return 0L;
+        switch (p.getPieceType()) {
+            case PAWN -> {
+                return PawnTable[getIndex(p.getPieceSide(), s)];
+            }
+            case KNIGHT -> {
+                return KnightTable[getIndex(p.getPieceSide(), s)];
+            }
+            case BISHOP -> {
+                return BishopTable[getIndex(p.getPieceSide(), s)];
+            }
+            case ROOK -> {
+                return RookTable[getIndex(p.getPieceSide(), s)];
+            }
+            case QUEEN -> {
+                return QueenTable[getIndex(p.getPieceSide(), s)];
+            }
+            case KING -> {
+                return KingEndingTable[getIndex(p.getPieceSide(), s)];
+            }
+            default -> {
+                return 0L;
+            }
+        }
     }
     private static long calculatePieceSquare(Board b, Side sideToMove) {
 
@@ -244,8 +251,6 @@ public class TapEvaluation {
 
         return somme;
     }
-
-
 
     private static int getIndex(Side side, Square sq)
     {

@@ -103,8 +103,8 @@ public class UCI {
             timer.interrupt();
         }
 
-        System.out.println("bestmove " + r.getBestMove());
-        System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.getNodeExplored() + " nodes explored | score : " + r.getNum() + " | depth = " + depth );
+        System.out.println("bestmove " + r.bestMove());
+        System.out.println("LeftSideNode found in " + Duration.between(start, finish).toMillis() + "ms | " + r.nodeExplored() + " nodes explored | score : " + r.num() + " | depth = " + depth );
     }
     public static void inputGo(Board board) {
         int depth = 5;

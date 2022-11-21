@@ -60,7 +60,7 @@ public class Node implements Callable<Result> {
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, false).getNum();
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, false).num();
                 board.undoMove();
 
                 if (maxEval < currentEval) {
@@ -82,7 +82,7 @@ public class Node implements Callable<Result> {
             for (Move move : children) {
                 incrementNodesCount();
                 board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, true).getNum();
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, true).num();
                 board.undoMove();
 
                 if (currentEval < minEval) {
@@ -129,6 +129,6 @@ public class Node implements Callable<Result> {
 
         //System.out.println("Node : " + this.name + " | score : " + r.getNum());
 
-        return new Result(r.getNum(), this.move, this.nodesExplored);
+        return new Result(r.num(), this.move, this.nodesExplored);
     }
 }
