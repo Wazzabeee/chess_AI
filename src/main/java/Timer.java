@@ -1,3 +1,5 @@
+// To respect 1s Constraint
+
 public class Timer extends Thread {
 
     private final LeftSideNode lsn;

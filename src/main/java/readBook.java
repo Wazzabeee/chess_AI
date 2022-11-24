@@ -95,8 +95,7 @@ public class readBook {
                     dataInputStream.skipBytes(8);
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception e) {}
     }
 
     /**

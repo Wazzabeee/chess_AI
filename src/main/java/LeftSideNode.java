@@ -1,4 +1,4 @@
-/* Basic Node Class. */
+/* LeftSideNode Class. */
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 
 import static java.lang.Math.min;
 
+// Ce sont les noeud le plus à gauche de l'arbre à savoir le meilleur move théorique
 public class LeftSideNode {
     
     private final Board board;
@@ -51,8 +52,8 @@ public class LeftSideNode {
         // Meilleur Move
         try {
             this.bestMove = this.children.get(0);
-        }
-        catch (Exception ignored) {}
+        } catch (Exception e) {}
+
         this.isActive = false;
         this.fils = null;
     }
@@ -101,7 +102,7 @@ public class LeftSideNode {
         }
 
         if (this.isActive()) {
-            // Attendre que tous les Nodes donnent un résultat
+            // Impossible d'ajouter une tâche à la pool
             this.executor.shutdown();
         } 
 
@@ -109,16 +110,13 @@ public class LeftSideNode {
             return new Result(score, this.bestMove, this.nodesExplored);
         }
 
-        try { 
-            //if (!this.executor.isShutdown()) {
-                // this.executor.awaitTermination(200, TimeUnit.MILLISECONDS);
-            //}
-        
+        try {        
             for (Future<Result> future : resultList) {    
                 if (!this.isActive()) {
                     break;
                 }
 
+                // Attend le résultat 
                 r = future.get();
 
                 this.incrementNodesCount(r.nodeExplored());
@@ -181,6 +179,7 @@ public class LeftSideNode {
         return this.isActive;
     }
 
+    // Timer Friendly
     public void stopAllThread() {
         if (this.fils != null && this.fils.isActive()) {
             this.fils.stopAllThread();

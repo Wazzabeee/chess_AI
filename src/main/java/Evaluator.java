@@ -4,10 +4,8 @@ import static java.lang.Long.bitCount;
 import static java.lang.Math.min;
 
 /**
- * Provide set of tools to evaluate a given position
+ * Fonction d'évaluation
  */
-
-
 public class Evaluator {
 
     private static final long PAWN_VALUE = 100L;
@@ -105,16 +103,15 @@ public class Evaluator {
      * @param b : etat du jeu actuel
      * @return double : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
-    public static double scoresFromFen(Board b)
-    {
-        if (b.isDraw()) // if draw return 0
-        {
+    public static double scoresFromFen(Board b) {
+        if (b.isDraw()) {
+            // if draw return 0
             return 0.0;
-        } else if (b.isMated() && (b.getSideToMove() == Side.WHITE)) // if mate and white to play then -inf
-        {
+        } else if (b.isMated() && (b.getSideToMove() == Side.WHITE)) {
+            // if mate and white to play then -inf
             return -MAX_VALUE;
-        } else if (b.isMated() && (b.getSideToMove() != Side.WHITE)) //if mate and black to play then +inf
-        {
+        } else if (b.isMated() && (b.getSideToMove() != Side.WHITE)) {
+            //if mate and black to play then +inf
             return MAX_VALUE;
         }
 
@@ -122,14 +119,10 @@ public class Evaluator {
         long materialOtherSide = scoreMaterial(b, Side.BLACK);
         long scorePieceSquares = scorePieceSquare(b);
 
-        //int m = (white) ? lastPlayerMoves : b.legalMoves().size();
-        //int M = (white) ? b.legalMoves().size() : lastPlayerMoves;
-
         return (materialSide - materialOtherSide) + scorePieceSquares;
     }
 
-    public static long getPieceStaticValue(Piece p)
-    {
+    public static long getPieceStaticValue(Piece p) {
         switch (p.getPieceType()) {
             case PAWN -> {
                 return PAWN_VALUE;
@@ -154,8 +147,8 @@ public class Evaluator {
             }
         }
     }
-    public static long getSquareStaticValue(Piece p, Square s)
-    {
+    
+    public static long getSquareStaticValue(Piece p, Square s) {
         switch (p.getPieceType()) {
             case PAWN -> {
                 return PawnTable[getIndex(p.getPieceSide(), s)];
@@ -196,31 +189,25 @@ public class Evaluator {
 
         long pieces = b.getBitboard(sideToMove) & ~ b.getBitboard(Piece.make(sideToMove, PieceType.KING));
 
-        while (pieces != 0L)
-        {
+        while (pieces != 0L) {
             int index = Bitboard.bitScanForward(pieces);
             pieces = Bitboard.extractLsb(pieces);
             Square sq = Square.squareAt(index);
             somme += getSquareStaticValue(b.getPiece(sq), sq);
         }
 
-        for (Square sq : b.getPieceLocation(Piece.make(sideToMove, PieceType.KING)))
-        {
+        for (Square sq : b.getPieceLocation(Piece.make(sideToMove, PieceType.KING))) {
             somme += (MAX_MATERIAL - phase) * KingOpeningTable[getIndex(sideToMove, sq)] /
                     MAX_MATERIAL + phase * KingEndingTable[getIndex(sideToMove, sq)] / MAX_MATERIAL;
         }
         return somme;
     }
 
-
-
-    private static int getIndex(Side side, Square sq)
-    {
+    private static int getIndex(Side side, Square sq) {
         return (side == Side.BLACK) ? sq.ordinal() : 63 - sq.ordinal();
     }
 
-    private static long countMaterial(Board b, Side s)
-    {
+    private static long countMaterial(Board b, Side s) {
         return (bitCount(b.getBitboard(Piece.make(s, PieceType.PAWN))) * PAWN_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.BISHOP))) * BISHOP_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.KNIGHT))) * KNIGHT_VALUE +

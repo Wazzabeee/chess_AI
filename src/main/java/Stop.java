@@ -1,3 +1,4 @@
+// Stop the programme if Timer is done
 public class Stop {
     private boolean stop;
 

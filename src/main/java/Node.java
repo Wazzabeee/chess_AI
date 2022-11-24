@@ -12,10 +12,9 @@ import com.github.bhlangonijr.chesslib.move.Move;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+// Le reste de l'arbre
 public class Node implements Callable<Result> {
 
-    // private String name;
-    
     private final Board board;
     private final Integer depth;
     private final Boolean playerToMaximize;
@@ -34,14 +33,11 @@ public class Node implements Callable<Result> {
 
         this.alpha = parent.getAlpha();
         this.beta = parent.getBeta();
-
-        // this.name = this.move.toString();
     }
 
     public Result alphaBetaCutOff(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
         // Cas Trivial
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) {
-            //return new Result(TapEvaluation.eval(board), null, 0);
             return new Result(Evaluator.scoresFromFen(board), null, 0);
         } 
 
@@ -126,8 +122,6 @@ public class Node implements Callable<Result> {
     @Override
     public Result call() {
         Result r = this.alphaBetaCutOff(this.board, this.depth, this.alpha, this.beta, this.playerToMaximize);
-
-        //System.out.println("Node : " + this.name + " | score : " + r.getNum());
 
         return new Result(r.num(), this.move, this.nodesExplored);
     }

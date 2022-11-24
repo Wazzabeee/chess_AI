@@ -11,7 +11,7 @@ import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
-    static String ENGINENAME="Wall-E";
+    static String ENGINENAME="PVS";
     private static boolean continueOpening = true;
     public static void uciCommunication() {
         Scanner input = new Scanner(System.in);
@@ -38,7 +38,7 @@ public class UCI {
     }
 
     public static void inputUCI() {
-        System.out.println("id name "+ENGINENAME);
+        System.out.println("id name " + ENGINENAME);
         System.out.println("id author Clément & Justin");
         //options go here
         System.out.println("uciok");
@@ -108,6 +108,7 @@ public class UCI {
     }
     public static void inputGo(Board board) {
         int depth = 5;
+        
         if(continueOpening) {
             Instant start = Instant.now();
             readBook rb = new readBook();
