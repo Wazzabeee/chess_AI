@@ -33,3 +33,5 @@ You can play against the AI using the console and [UCI](http://wbec-ridderkerk.n
 <p float="left">
   <img src="https://github.com/Wazzabeee/chess_AI/blob/main/images/details.PNG" />
 </p>
+
+Games history can be found [here](https://www.chess.com/member/8inf878).
