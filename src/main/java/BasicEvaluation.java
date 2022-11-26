@@ -132,7 +132,7 @@ public class BasicEvaluation {
      * @param p : Piece
      * @return Valeur matérielle de la pièce
      */
-    public static long getPieceStaticValue(Piece p) {
+    public static long getPieceValue(Piece p) {
         switch (p.getPieceType()) {
             case PAWN -> {
                 return PAWN_VALUE;
@@ -165,25 +165,25 @@ public class BasicEvaluation {
      * @param s : Case sur laquelle se trouve la pièce
      * @return Score positionnel associé à la Pièce p sur la case s
      */
-    public static long getSquareStaticValue(Piece p, Square s) {
+    public static long getSquareValue(Piece p, Square s) {
         switch (p.getPieceType()) {
             case PAWN -> {
-                return PawnTable[getIndex(p.getPieceSide(), s)];
+                return PawnTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case KNIGHT -> {
-                return KnightTable[getIndex(p.getPieceSide(), s)];
+                return KnightTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case BISHOP -> {
-                return BishopTable[getIndex(p.getPieceSide(), s)];
+                return BishopTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case ROOK -> {
-                return RookTable[getIndex(p.getPieceSide(), s)];
+                return RookTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case QUEEN -> {
-                return QueenTable[getIndex(p.getPieceSide(), s)];
+                return QueenTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case KING -> {
-                return KingEndingTable[getIndex(p.getPieceSide(), s)];
+                return KingEndingTable[getPSTIndex(p.getPieceSide(), s)];
             }
             default -> {
                 return 0L;
@@ -192,7 +192,7 @@ public class BasicEvaluation {
     }
 
     private static long scoreMaterial(Board b, Side s) {
-        return countMaterial(b, s) - countMaterial(b, s.flip()); // Différence matérielle
+        return countPieces(b, s) - countPieces(b, s.flip()); // Différence matérielle
     }
 
     private static long scorePieceSquare(Board b) { // Différence positionelle
@@ -214,13 +214,13 @@ public class BasicEvaluation {
             pieces = Bitboard.extractLsb(pieces);
 
             Square sq = Square.squareAt(index); // Récupère la case échiquéenne
-            somme += getSquareStaticValue(b.getPiece(sq), sq); // PST score
+            somme += getSquareValue(b.getPiece(sq), sq); // PST score
         }
 
         // Mini phase / tap evaluation faire évoluer les recompenses du roi en EndGame
         for (Square sq : b.getPieceLocation(Piece.make(sideToMove, PieceType.KING))) {
-            somme += (MAX_MATERIAL - phase) * KingOpeningTable[getIndex(sideToMove, sq)] /
-                    MAX_MATERIAL + phase * KingEndingTable[getIndex(sideToMove, sq)] / MAX_MATERIAL;
+            somme += (MAX_MATERIAL - phase) * KingOpeningTable[getPSTIndex(sideToMove, sq)] /
+                    MAX_MATERIAL + phase * KingEndingTable[getPSTIndex(sideToMove, sq)] / MAX_MATERIAL;
         }
         return somme;
     }
@@ -232,7 +232,7 @@ public class BasicEvaluation {
      * @param sq : Case en notation échiquéenne
      * @return int : index dans la Piece Square Table
      */
-    private static int getIndex(Side side, Square sq) {
+    private static int getPSTIndex(Side side, Square sq) {
         return (side == Side.BLACK) ? sq.ordinal() : 63 - sq.ordinal();
     }
 
@@ -243,7 +243,7 @@ public class BasicEvaluation {
      * @param s : Joueur actuel
      * @return long : score matériel du joueur
      */
-    public static long countMaterial(Board b, Side s) {
+    public static long countPieces(Board b, Side s) {
         return (bitCount(b.getBitboard(Piece.make(s, PieceType.PAWN))) * PAWN_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.BISHOP))) * BISHOP_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.KNIGHT))) * KNIGHT_VALUE +

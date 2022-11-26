@@ -95,7 +95,7 @@ public class TranspositionTable {
                 board.undoMove();
 
                 if (maxEval < currentEval) {
-                    type = 0; // mise à jour du type de noeud TT
+                    type = 0; // MAJ du type de noeud TT
                     maxEval = currentEval;
                     bestMove = move;
                 }
@@ -109,7 +109,7 @@ public class TranspositionTable {
             recordHash(board.getIncrementalHashKey(), depth, alpha, type); // ajout du noeud dans la TT
             return new Result(maxEval, bestMove, 0);
         } else {
-            int type = -1;
+            int type = -1; // type de noeud pour TT
             double minEval = beta;
 
             for (Move move : children) {

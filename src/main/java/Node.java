@@ -157,11 +157,11 @@ public class Node implements Callable<Result> {
         Piece attackingPiece = b.getPiece(move.getFrom());
 
         if (attackedPiece != Piece.NONE)
-            return BasicEvaluation.getPieceStaticValue(attackedPiece);
+            return BasicEvaluation.getPieceValue(attackedPiece);
         if (move.getPromotion() != Piece.NONE)
-            return BasicEvaluation.getPieceStaticValue(move.getPromotion());
+            return BasicEvaluation.getPieceValue(move.getPromotion());
 
-        return BasicEvaluation.getSquareStaticValue(attackingPiece, move.getTo());
+        return BasicEvaluation.getSquareValue(attackingPiece, move.getTo());
 
     }
 

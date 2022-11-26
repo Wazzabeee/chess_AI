@@ -124,15 +124,15 @@ public class TaperedEvaluation {
         }
 
         // Score des blancs selon les bonus et pénalités d'un début de partie
-        double openingWhiteValue = countMaterial(b, Side.WHITE) + calculatePieceSquare(b, Side.WHITE);
+        double openingWhiteValue = countPieces(b, Side.WHITE) + calculatePieceSquare(b, Side.WHITE);
         // Score des blancs selon les bonus et pénalités d'une fin de partie
-        double endingWhiteValue = openingWhiteValue + KingEndingTable[getIndex(Side.WHITE,
+        double endingWhiteValue = openingWhiteValue + KingEndingTable[getPSTIndex(Side.WHITE,
                 b.getPieceLocation(Piece.make(Side.WHITE, PieceType.KING)).get(0))];
 
         // Score des noirs selon les bonus et pénalités d'un début de partie
-        double openingBlackValue = countMaterial(b, Side.BLACK) + calculatePieceSquare(b, Side.BLACK);
+        double openingBlackValue = countPieces(b, Side.BLACK) + calculatePieceSquare(b, Side.BLACK);
         // Score des noirs selon les bonus et pénalités d'une fin de partie
-        double endingBlackValue = openingBlackValue + KingEndingTable[getIndex(Side.BLACK,
+        double endingBlackValue = openingBlackValue + KingEndingTable[getPSTIndex(Side.BLACK,
                 b.getPieceLocation(Piece.make(Side.BLACK, PieceType.KING)).get(0))];
 
         int phase = getPhase(b); // MAJ de la phase
@@ -188,25 +188,25 @@ public class TaperedEvaluation {
      * @param s : Case sur laquelle se trouve la pièce
      * @return Score positionnel associé à la Pièce p sur la case s
      */
-    public static long getSquareStaticValue(Piece p, Square s) {
+    public static long getSquareValue(Piece p, Square s) {
         switch (p.getPieceType()) {
             case PAWN -> {
-                return PawnTable[getIndex(p.getPieceSide(), s)];
+                return PawnTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case KNIGHT -> {
-                return KnightTable[getIndex(p.getPieceSide(), s)];
+                return KnightTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case BISHOP -> {
-                return BishopTable[getIndex(p.getPieceSide(), s)];
+                return BishopTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case ROOK -> {
-                return RookTable[getIndex(p.getPieceSide(), s)];
+                return RookTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case QUEEN -> {
-                return QueenTable[getIndex(p.getPieceSide(), s)];
+                return QueenTable[getPSTIndex(p.getPieceSide(), s)];
             }
             case KING -> {
-                return KingEndingTable[getIndex(p.getPieceSide(), s)];
+                return KingEndingTable[getPSTIndex(p.getPieceSide(), s)];
             }
             default -> {
                 return 0L;
@@ -252,10 +252,10 @@ public class TaperedEvaluation {
                 queenCount += 1;
             }
 
-            somme += getSquareStaticValue(currentPiece, sq); // PST score
+            somme += getSquareValue(currentPiece, sq); // PST score
         }
 
-        somme += KingOpeningTable[getIndex(sideToMove,
+        somme += KingOpeningTable[getPSTIndex(sideToMove,
                 b.getPieceLocation(Piece.make(sideToMove, PieceType.KING)).get(0))];
 
         // Ajustement de la valeur des cavalier en fonction du nombre de pions en jeu
@@ -304,7 +304,7 @@ public class TaperedEvaluation {
      * @param sq : Case en notation échiquéenne
      * @return int : index dans la Piece Square Table
      */
-    private static int getIndex(Side side, Square sq) {
+    private static int getPSTIndex(Side side, Square sq) {
         return (side == Side.BLACK) ? sq.ordinal() : 63 - sq.ordinal();
     }
 
@@ -315,7 +315,7 @@ public class TaperedEvaluation {
      * @param s : Joueur actuel
      * @return long : score matériel du joueur
      */
-    private static long countMaterial(Board b, Side s) {
+    private static long countPieces(Board b, Side s) {
         return (bitCount(b.getBitboard(Piece.make(s, PieceType.PAWN))) * PAWN_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.BISHOP))) * BISHOP_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.KNIGHT))) * KNIGHT_VALUE +
