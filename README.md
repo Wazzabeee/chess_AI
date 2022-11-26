@@ -18,7 +18,7 @@ It uses the [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) protocol. We 
 - move ordering 
 - opening book (20 000 games)
 
-It can deliver a move in less than a second at depth 5 on most computers. If your computer has lot of cores, you may want to try put the depth parameter to 7 and modify the 1 second time limit in Timer.java.
+It can deliver a move in less than a second at depth 5 on most computers. If your computer has lot of cores, you may want to try at depth 7 and modify the 1 second time limit in Timer.java.
 
 Thanks to it we won the small tournament organized between the IA of the students of the class.
 
