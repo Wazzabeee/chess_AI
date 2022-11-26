@@ -1,4 +1,6 @@
-// Stop the programme if Timer is done
+/**
+ * Classe permettant d'arrêter la recherche si le temps défini est écoulé
+ */
 public class Stop {
     private boolean stop;
 

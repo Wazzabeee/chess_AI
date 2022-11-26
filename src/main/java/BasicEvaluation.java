@@ -4,19 +4,23 @@ import static java.lang.Long.bitCount;
 import static java.lang.Math.min;
 
 /**
- * Fonction d'évaluation
+ * Fonction d'évaluation basique
  */
-public class Evaluator {
+public class BasicEvaluation {
+    // Valeurs statiques des pièces
 
     private static final long PAWN_VALUE = 100L;
-    private static final long BISHOP_VALUE = 320L;
     private static final long KNIGHT_VALUE = 315L;
+    private static final long BISHOP_VALUE = 320L;
     private static final long ROOK_VALUE = 500L;
     private static final long QUEEN_VALUE = 900L;
     private static final long MATE_VALUE = 39000L;
     private static final long MAX_VALUE = 40000L;
 
+    // Valeur maximale du matériel en jeu
     private static final long MAX_MATERIAL = PAWN_VALUE * 8 + KNIGHT_VALUE * 2 + BISHOP_VALUE * 2 + ROOK_VALUE * 2 + QUEEN_VALUE;
+
+    // Piece Square Tables
     private static final short[] PawnTable = new short[]
             {
                     0, 0, 0, 0, 0, 0, 0, 0,
@@ -103,9 +107,9 @@ public class Evaluator {
      * @param b : etat du jeu actuel
      * @return double : score de l'heuristique (>0 avantage blanc, <0 avantage noir, =0 : egal)
      */
-    public static double scoresFromFen(Board b) {
+    public static double evaluate(Board b) {
         if (b.isDraw()) {
-            // if draw return 0
+            // If draw return 0
             return 0.0;
         } else if (b.isMated() && (b.getSideToMove() == Side.WHITE)) {
             // if mate and white to play then -inf
@@ -115,13 +119,19 @@ public class Evaluator {
             return MAX_VALUE;
         }
 
-        long materialSide = scoreMaterial(b, Side.WHITE);
-        long materialOtherSide = scoreMaterial(b, Side.BLACK);
-        long scorePieceSquares = scorePieceSquare(b);
+        long materialSide = scoreMaterial(b, Side.WHITE); // White material
+        long materialOtherSide = scoreMaterial(b, Side.BLACK); // Black material
+        long scorePieceSquares = scorePieceSquare(b); // Score positionnel (white - black)
 
         return (materialSide - materialOtherSide) + scorePieceSquares;
     }
 
+    /**
+     * Renvoi la valeur matérielle d'une pièce
+     *
+     * @param p : Piece
+     * @return Valeur matérielle de la pièce
+     */
     public static long getPieceStaticValue(Piece p) {
         switch (p.getPieceType()) {
             case PAWN -> {
@@ -147,7 +157,14 @@ public class Evaluator {
             }
         }
     }
-    
+
+    /**
+     * Renvoi le score associé à la PST de la pièce
+     *
+     * @param p : Pièce
+     * @param s : Case sur laquelle se trouve la pièce
+     * @return Score positionnel associé à la Pièce p sur la case s
+     */
     public static long getSquareStaticValue(Piece p, Square s) {
         switch (p.getPieceType()) {
             case PAWN -> {
@@ -175,10 +192,10 @@ public class Evaluator {
     }
 
     private static long scoreMaterial(Board b, Side s) {
-        return countMaterial(b, s) - countMaterial(b, s.flip());
+        return countMaterial(b, s) - countMaterial(b, s.flip()); // Différence matérielle
     }
 
-    private static long scorePieceSquare(Board b) {
+    private static long scorePieceSquare(Board b) { // Différence positionelle
         return calculatePieceSquare(b, Side.WHITE, scoreMaterial(b, Side.WHITE)) -
                 calculatePieceSquare(b, Side.BLACK, scoreMaterial(b, Side.BLACK));
     }
@@ -190,12 +207,17 @@ public class Evaluator {
         long pieces = b.getBitboard(sideToMove) & ~ b.getBitboard(Piece.make(sideToMove, PieceType.KING));
 
         while (pieces != 0L) {
+            // Scan Forward pour trouver l'index Least Significant 1 Bit
             int index = Bitboard.bitScanForward(pieces);
+
+            // Extraction du Least Significant Bit
             pieces = Bitboard.extractLsb(pieces);
-            Square sq = Square.squareAt(index);
-            somme += getSquareStaticValue(b.getPiece(sq), sq);
+
+            Square sq = Square.squareAt(index); // Récupère la case échiquéenne
+            somme += getSquareStaticValue(b.getPiece(sq), sq); // PST score
         }
 
+        // Mini phase / tap evaluation faire évoluer les recompenses du roi en EndGame
         for (Square sq : b.getPieceLocation(Piece.make(sideToMove, PieceType.KING))) {
             somme += (MAX_MATERIAL - phase) * KingOpeningTable[getIndex(sideToMove, sq)] /
                     MAX_MATERIAL + phase * KingEndingTable[getIndex(sideToMove, sq)] / MAX_MATERIAL;
@@ -203,11 +225,25 @@ public class Evaluator {
         return somme;
     }
 
+    /**
+     * Renvoi à partir d'une case échiquéenne, l'index associé dans une PST
+     *
+     * @param side : Joueur actuel
+     * @param sq : Case en notation échiquéenne
+     * @return int : index dans la Piece Square Table
+     */
     private static int getIndex(Side side, Square sq) {
         return (side == Side.BLACK) ? sq.ordinal() : 63 - sq.ordinal();
     }
 
-    private static long countMaterial(Board b, Side s) {
+    /**
+     * Compte les bits correspondant à chacune des pièces du joueur s
+     *
+     * @param b : Etat du jeu actuel
+     * @param s : Joueur actuel
+     * @return long : score matériel du joueur
+     */
+    public static long countMaterial(Board b, Side s) {
         return (bitCount(b.getBitboard(Piece.make(s, PieceType.PAWN))) * PAWN_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.BISHOP))) * BISHOP_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.KNIGHT))) * KNIGHT_VALUE +

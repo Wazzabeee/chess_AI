@@ -1,4 +1,9 @@
-
+/**
+ *
+ * Classe permettant de traduire une position au format FEN au format binaire reconnu par le logiciel Polyglot
+ * Auteur : <a href="https://github.com/albertoruibal/carballo">...</a>
+ *
+ */
 public class fenToPolyglot {
 
     static final long[] random64 = {0x9D39247E33776D41L, 0x2AF7398005AAA5C7L, 0x44DB015024623547L, 0x9C15F73E62A76AE2L, 0x75834465489C0C89L,

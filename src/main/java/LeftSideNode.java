@@ -1,7 +1,6 @@
 /* LeftSideNode Class. */
 
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.move.Move;
 
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import java.util.concurrent.Future;
 
 import static java.lang.Math.min;
 
-// Ce sont les noeud le plus à gauche de l'arbre à savoir le meilleur move théorique
+// Ce sont les noeuds le plus à gauche de l'arbre à savoir le meilleur move théorique
 public class LeftSideNode {
     
     private final Board board;
@@ -46,7 +45,7 @@ public class LeftSideNode {
         
         // Récupère les Moves et les tri
         this.children = this.board.legalMoves();
-        this.children.sort(Comparator.comparingInt((Move m) -> (int) getMoveScore(this.board, m)));
+        this.children.sort(Comparator.comparingInt((Move m) -> (int) Node.getMoveScore(this.board, m)));
         Collections.reverse(this.children);
 
         // Meilleur Move
@@ -139,19 +138,6 @@ public class LeftSideNode {
         this.isActive = false;
 
         return new Result(score, this.bestMove, this.nodesExplored);
-    }
-
-    private static long getMoveScore(Board b, Move move) {
-        Piece attackedPiece = b.getPiece(move.getTo());
-        Piece attackingPiece = b.getPiece(move.getFrom());
-
-        if (attackedPiece != Piece.NONE)
-            return Evaluator.getPieceStaticValue(attackedPiece);
-        if (move.getPromotion() != Piece.NONE)
-            return Evaluator.getPieceStaticValue(move.getPromotion());
-
-        return Evaluator.getSquareStaticValue(attackingPiece, move.getTo());
-
     }
 
     public Double getAlpha() {

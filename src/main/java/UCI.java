@@ -12,9 +12,9 @@ import com.github.bhlangonijr.chesslib.move.MoveList;
 
 public class UCI {
     static String ENGINENAME="PVS";
-    private static boolean continueOpening = true;
+    private static boolean continueOpening = true; // true : utilise openingbook / false : non
     public static void uciCommunication() {
-        Scanner input = new Scanner(System.in);
+        Scanner input = new Scanner(System.in); // on récupère les instructions d'ARENA
 
         Board board = new Board();
 
@@ -27,8 +27,8 @@ public class UCI {
             } else if ("isready".equals(inputString)) {
                 inputIsReady();
             } else if ("ucinewgame".equals(inputString)) {
-                continueOpening = true;
-                inputUCINewGame(board);
+                continueOpening = true; // réinitialise le booléen car nouvelle partie
+                inputUCINewGame(board); // réinitialise le board
             } else if (inputString.startsWith("position")) {
                 inputPosition(inputString, board);
             } else if (inputString.startsWith("go")) {
@@ -40,7 +40,6 @@ public class UCI {
     public static void inputUCI() {
         System.out.println("id name " + ENGINENAME);
         System.out.println("id author Clément & Justin");
-        //options go here
         System.out.println("uciok");
     }
 
@@ -53,11 +52,10 @@ public class UCI {
     }
 
     public static void inputUCINewGame(Board board) {
-        board.loadFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        board.loadFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // FEN de départ
     }
 
     public static void inputPosition(String input, Board board) {
-        //System.out.println(input);
         input=input.substring(9).concat(" ");
         if (input.contains("startpos ")) {
             input=input.substring(9);
@@ -86,19 +84,27 @@ public class UCI {
             list.loadFromSan(input);
             board.loadFromFen(list.getFen());
         }
-    } 
+    }
 
+    /**
+     * Affiche le meilleur coup pour le prochain joueur en un temps défini
+     *
+     * @param board : Etat du jeu actuel sur Arena
+     * @param depth : Profondeur totale de recherche
+     */
     public static void search(Board board, int depth) {
-        Stop stop = new Stop();
+        Stop stop = new Stop(); // Timer d'arrêt (1 sec pour le tournoi)
 
+        // PVS
         LeftSideNode root = new LeftSideNode(board, depth, -Double.MAX_VALUE, Double.MAX_VALUE, board.getSideToMove() == Side.WHITE, stop);
+
         Timer timer = new Timer(root, stop);
-        timer.start();
+        timer.start(); // Lance le timer dans un thread à part
         Instant start = Instant.now();
-        Result r = root.PVS();
+        Result r = root.PVS(); // Resultat = Racine de l'arbre
         Instant finish = Instant.now();
 
-        if (!stop.getStop()) {
+        if (!stop.getStop()) { // Si on a trouvé un coup avant la fin du timer
             stop.setTrueStop();
             timer.interrupt();
         }
@@ -109,14 +115,14 @@ public class UCI {
     public static void inputGo(Board board) {
         int depth = 5;
         
-        if(continueOpening) {
+        if(continueOpening) { // Si on souhaite utiliser l'opening book et que le dernier coup trouvée != NULL
             Instant start = Instant.now();
-            readBook rb = new readBook();
-            Move move = rb.getMove(board);
+            openingBook rb = new openingBook();
+            Move move = rb.getMove(board); // récupère le premier move trouvé
 
-            if (move == null) {
+            if (move == null) { // Si null fin de l'opening
                 continueOpening = false;
-                search(board, depth);
+                search(board, depth); // PVS
             }
             else {
                 Instant finish = Instant.now();
@@ -125,6 +131,6 @@ public class UCI {
             }
         }
         else
-            search(board, depth);
+            search(board, depth); // PVS
     }
 }

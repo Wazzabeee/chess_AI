@@ -2,18 +2,27 @@ import com.github.bhlangonijr.chesslib.*;
 
 import static java.lang.Long.bitCount;
 
-public class TapEvaluation {
+/**
+ * Fonction d'évaluation évolutive au fil de la partie
+ */
+public class TaperedEvaluation {
 
-    private static final int PHASE_CONSTANT = 256;
+    private static final int PHASE_CONSTANT = 256; // Phase maximale (diminue au cours de la partie)
+
+    // Valeur des pièces
     private static final long PAWN_VALUE = 100L;
-    private static final long BISHOP_VALUE = 320L;
     private static final long KNIGHT_VALUE = 315L;
+    private static final long BISHOP_VALUE = 320L;
     private static final long ROOK_VALUE = 500L;
     private static final long QUEEN_VALUE = 900L;
     private static final long MATE_VALUE = 39000L;
+
+    // Pénalités
     private static final int KNIGHT_PENALTY =  -10;
     private static final int ROOK_PENALTY = -20;
     private static final int NO_PAWNS_PENALTY = -20;
+
+    // Bonus ou malus en fonction du nombre de pions en jeu
     private static final int[] KNIGHT_PAWN_ADJUSTMENT =
             {-30, -20, -15, -10, -5, 0, 5, 10, 15};
     private static final int[] ROOK_PAWN_ADJUSTMENT =
@@ -21,6 +30,7 @@ public class TapEvaluation {
     private static final int[] DUAL_BISHOP_ADJUSTMENT =
             {40, 40, 35, 30, 25, 20, 20, 15, 15};
 
+    // Piece Square Tables
     private static final short[] PawnTable = new short[]
             {
                     0,  0,  0,  0,  0,  0,  0,  0,
@@ -113,31 +123,44 @@ public class TapEvaluation {
             return MATE_VALUE;
         }
 
+        // Score des blancs selon les bonus et pénalités d'un début de partie
         double openingWhiteValue = countMaterial(b, Side.WHITE) + calculatePieceSquare(b, Side.WHITE);
+        // Score des blancs selon les bonus et pénalités d'une fin de partie
         double endingWhiteValue = openingWhiteValue + KingEndingTable[getIndex(Side.WHITE,
                 b.getPieceLocation(Piece.make(Side.WHITE, PieceType.KING)).get(0))];
 
+        // Score des noirs selon les bonus et pénalités d'un début de partie
         double openingBlackValue = countMaterial(b, Side.BLACK) + calculatePieceSquare(b, Side.BLACK);
+        // Score des noirs selon les bonus et pénalités d'une fin de partie
         double endingBlackValue = openingBlackValue + KingEndingTable[getIndex(Side.BLACK,
                 b.getPieceLocation(Piece.make(Side.BLACK, PieceType.KING)).get(0))];
 
-        int phase = getPhase(b);
+        int phase = getPhase(b); // MAJ de la phase
 
+        // Calcul du score de chaque camp avec une plus grande importance pour le score d'ouverture ou de
+        // fermeture en fonction de la valeur de la phase.
         double whiteValue = ((openingWhiteValue * (PHASE_CONSTANT - phase)) +
                 (endingWhiteValue * phase)) / PHASE_CONSTANT;
 
         double blackValue = ((openingBlackValue * (PHASE_CONSTANT - phase)) +
                 (endingBlackValue * phase)) / PHASE_CONSTANT;
 
-
-        // Return the difference between our current score and opponents
+        // Renvoie la différence entre les deux scores si ce n'est pas un nul par répétition
         if (!b.isRepetition()) {
             return whiteValue - blackValue;
         }
 
+        // Si les blancs ont l'avantage on renvoie -MATE_VALUE pour éviter le nul, sinon on renvoie 0
         return (whiteValue - blackValue > 0) ? -MATE_VALUE : 0.0;
     }
 
+    /**
+     * Calcul de la phase en fonction des pièces encore en jeu
+     * Inspiré de : <a href="https://www.chessprogramming.org/Tapered_Eval">...</a>
+     *
+     * @param b : Position actuelle
+     * @return : int : Phase à jour
+     */
     private static int getPhase(Board b) {
         int knightPhase = 1;
         int bishopPhase = 1;
@@ -158,6 +181,13 @@ public class TapEvaluation {
         return (phase * PHASE_CONSTANT + (totalPhase / 2)) / totalPhase;
     }
 
+    /**
+     * Renvoi le score associé à la PST de la pièce
+     *
+     * @param p : Pièce
+     * @param s : Case sur laquelle se trouve la pièce
+     * @return Score positionnel associé à la Pièce p sur la case s
+     */
     public static long getSquareStaticValue(Piece p, Square s) {
         switch (p.getPieceType()) {
             case PAWN -> {
@@ -188,18 +218,24 @@ public class TapEvaluation {
 
         long somme = 0L;
         long pieces = b.getBitboard(sideToMove) & ~ b.getBitboard(Piece.make(sideToMove, PieceType.KING));
+
+        // Variables pour compter au fil du parcours du bitboard le nombre de pièces par catégorie
         int knightCount, bishopCount, rookCount, pawnCount, opponentPawnCount, queenCount;
         knightCount = bishopCount = rookCount = pawnCount = queenCount = 0;
         Side opponentSide = (sideToMove == Side.WHITE) ? Side.BLACK : Side.WHITE;
 
         while (pieces != 0L) {
+            // Scan Forward pour trouver l'index Least Significant 1 Bit
             int index = Bitboard.bitScanForward(pieces);
+
+            // Extraction du Least Significant Bit
             pieces = Bitboard.extractLsb(pieces);
-            Square sq = Square.squareAt(index);
+
+            Square sq = Square.squareAt(index); // Récupère la case échiquéenne
             Piece currentPiece = b.getPiece(sq);
 
             PieceType pt = currentPiece.getPieceType();
-
+            // Suite de if plutôt que switch pour tester .JAR sur PC UQAC (Java 8...)
             if(pt == PieceType.PAWN) {
                 pawnCount += 1;
             }
@@ -216,21 +252,26 @@ public class TapEvaluation {
                 queenCount += 1;
             }
 
-            somme += getSquareStaticValue(currentPiece, sq);
+            somme += getSquareStaticValue(currentPiece, sq); // PST score
         }
 
         somme += KingOpeningTable[getIndex(sideToMove,
                 b.getPieceLocation(Piece.make(sideToMove, PieceType.KING)).get(0))];
 
+        // Ajustement de la valeur des cavalier en fonction du nombre de pions en jeu
         if (knightCount > 0) {
             somme += (long) KNIGHT_PAWN_ADJUSTMENT[pawnCount] * knightCount;
         }
+        // Ajustement de la valeur des tours en fonction du nombre de pions en jeu
         if (rookCount > 0) {
             somme += (long) ROOK_PAWN_ADJUSTMENT[pawnCount] * rookCount;
         }
+        // Ajustement de la valeur d'une paire de fou en fonction du nombre de pions en jeu
         if (bishopCount > 1) {
             somme += DUAL_BISHOP_ADJUSTMENT[pawnCount];
         }
+
+        // Autres pénalités
         if (knightCount > 1) {
             somme += KNIGHT_PENALTY;
         }
@@ -241,13 +282,13 @@ public class TapEvaluation {
             somme += NO_PAWNS_PENALTY;
         }
 
-        // Program should not expect to win with very low material
+        // L'IA ne doit pas s'attendre à gagner avec très peu de pièces
         if ((pawnCount == 0) && (somme < BISHOP_VALUE) && (somme > 0)) {
             return 0;
         }
 
         opponentPawnCount = bitCount(b.getBitboard(Piece.make(opponentSide, PieceType.PAWN)));
-        // Program should not except to win having only 2 knights and no pawns
+        // MAT impossible avec seulement 2 cavaliers et pas de pions
         if (somme > 0 && pawnCount == 0 && opponentPawnCount == 0 && knightCount == 2 &&
                 bishopCount == 0 && rookCount == 0 && queenCount == 0) {
             return 0;
@@ -256,10 +297,24 @@ public class TapEvaluation {
         return somme;
     }
 
+    /**
+     * Renvoi à partir d'une case échiquéenne, l'index associé dans une PST
+     *
+     * @param side : Joueur actuel
+     * @param sq : Case en notation échiquéenne
+     * @return int : index dans la Piece Square Table
+     */
     private static int getIndex(Side side, Square sq) {
         return (side == Side.BLACK) ? sq.ordinal() : 63 - sq.ordinal();
     }
 
+    /**
+     * Compte les bits correspondant à chacune des pièces du joueur s
+     *
+     * @param b : Etat du jeu actuel
+     * @param s : Joueur actuel
+     * @return long : score matériel du joueur
+     */
     private static long countMaterial(Board b, Side s) {
         return (bitCount(b.getBitboard(Piece.make(s, PieceType.PAWN))) * PAWN_VALUE +
                 bitCount(b.getBitboard(Piece.make(s, PieceType.BISHOP))) * BISHOP_VALUE +

@@ -9,15 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Polyglot opening book support
- *
- * @author rui
- *
- * Borrowed from: https://github.com/albertoruibal/carballo
+ * Classe permettant la lecture d'un livre d'ouvertures Polyglot
+ * Code adapté de: <a href="https://github.com/albertoruibal/carballo">...</a>
  */
-public class readBook {
-    // https://github.com/michaeldv/donna_opening_books
-    // https://chessengines.blogspot.com/2021/01/new-chess-opening-book-m112-bin-and-ctg.html
+public class openingBook {
 
     private final String bookName;
 
@@ -25,13 +20,12 @@ public class readBook {
     List<Short> weights = new ArrayList<>();
     long totalWeight;
 
-    public readBook() {
+    public openingBook() {
         bookName = "book.bin";
-    }
+    } // livre trouvable dans src/main/resources/book.bin
 
     /**
      * "move" is a bit field with the following meaning (bit 0 is the least significant bit)
-     * <p/>
      * bits                meaning
      * ===================================
      * 0,1,2               to file
@@ -64,6 +58,7 @@ public class readBook {
         moves.clear();
         weights.clear();
 
+        // traduit la position actuelle en clé à trouver dans le fichier binaire
         long key2Find = fenToPolyglot.getKey(board.getFen());
 
         try {
@@ -76,36 +71,40 @@ public class readBook {
             while (true) {
                 key = dataInputStream.readLong();
 
+                // Si on trouve une clé correspondante
                 if (key == key2Find) {
                     moveInt = dataInputStream.readShort();
                     weight = dataInputStream.readShort();
                     dataInputStream.readInt(); // Unused learn field
 
+                    // Traduction du move dans un format connu
                     Move move = new Move(int2MoveString(moveInt), board.getSideToMove());
                     System.out.println(int2MoveString(moveInt) + " " + weight);
 
-                    // Add only if it is legal
+                    // Ajoute ssi le move est légal
                     if (board.isMoveLegal(move, true)) {
                         moves.add(move);
                         weights.add(weight);
                         totalWeight += weight;
+                        // on s'arrête directement pour gagner du temps et récupérer le premier coup
+                        // les données sont triées, il s'agit donc du coup le plus joué dans le livre
                         break;
                     }
                 } else {
-                    dataInputStream.skipBytes(8);
+                    dataInputStream.skipBytes(8); // on skip à la prochaine clé
                 }
             }
         } catch (Exception e) {}
     }
 
     /**
-     * Gets a random move from the book taking care of weights
+     * Récupère le move le plus joué lors de l'ouverture à partir de la position actuelle
      */
     public Move getMove(Board board) {
         generateMoves(board);
         if (!moves.isEmpty())
             return moves.get(0);
         else
-            return null;
+            return null; // Valeur qui va faire changer la valeur le booléen dans UCI.java (fin de l'opening)
     }
 }

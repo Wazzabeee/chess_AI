@@ -35,10 +35,21 @@ public class Node implements Callable<Result> {
         this.beta = parent.getBeta();
     }
 
+    /**
+     * Minimax à profondeur limitée avec élagage alpha beta "sans faille" (fail-soft)
+     *
+     * @param board : Position de jeu actuelle
+     * @param depth : Profondeur restante de recherche
+     * @param alpha : Borne alpha pour élagage
+     * @param beta : Borne beta pour élagage
+     * @param playerToMaximize : Booléen (Vrai = BLanc, Noir sinon)
+     * @return : Record (Evaluation, bestMove, NodesExplored)
+     */
     public Result alphaBetaCutOff(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
-        // Cas Trivial
+        // Si feuille ou cas terminal
         if (depth == 0 || board.isDraw() || board.isMated() || board.isStaleMate()) {
-            return new Result(Evaluator.scoresFromFen(board), null, 0);
+            // Possibilité de modifier l'appel ci-dessous pour utiliser la Tapered Evaluation ou Quiescent Search
+            return new Result(BasicEvaluation.evaluate(board), null, 0);
         } 
 
         // Génère la liste des mouvements possibles
@@ -48,18 +59,20 @@ public class Node implements Callable<Result> {
         children.sort(Comparator.comparingInt((Move m) -> (int) getMoveScore(board, m)));
         Collections.reverse(children);
 
-        Move bestMove = children.get(0);
+        Move bestMove = children.get(0); // Récupère un move au cas où il y a un problème plus bas
 
-        if (playerToMaximize) {
+        if (playerToMaximize) { // If White
             Double maxEval = alpha;
 
             for (Move move : children) {
-                incrementNodesCount();
-                board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, false).num();
-                board.undoMove();
+                incrementNodesCount(); // MAJ du nombre de noeuds
 
-                if (maxEval < currentEval) {
+                board.doMove(move); // On effectue le coup directement sur le board (pas de copie)
+
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, false).num();
+                board.undoMove(); // On annule le coup
+
+                if (maxEval < currentEval) { // Maj de l'eval + move
                     maxEval = currentEval;
                     bestMove = move;
                 }
@@ -67,21 +80,23 @@ public class Node implements Callable<Result> {
                 alpha = max(alpha, maxEval);
 
                 if (beta <= alpha) {
-                    break;
+                    break; // Beta cut off
                 }
             }
 
             return new Result(maxEval, bestMove, this.nodesExplored);
-        } else {
+
+        } else { // Black player
             Double minEval = beta;
 
             for (Move move : children) {
-                incrementNodesCount();
-                board.doMove(move);
-                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, true).num();
-                board.undoMove();
+                incrementNodesCount(); // MAJ du nombre de noeuds
 
-                if (currentEval < minEval) {
+                board.doMove(move); // On effectue le coup directement sur le board (pas de copie)
+                double currentEval = alphaBetaCutOff(board, depth - 1, alpha, beta, true).num();
+                board.undoMove(); // On annule le coup
+
+                if (currentEval < minEval) { // MAJ de l'eval + move
                     minEval = currentEval;
                     bestMove = move;
                 }
@@ -89,7 +104,7 @@ public class Node implements Callable<Result> {
                 beta = min(beta, minEval);
 
                 if (beta <= alpha) {
-                    break;
+                    break; // Alpha cut off
                 }
             }
 
@@ -97,22 +112,61 @@ public class Node implements Callable<Result> {
         }
     }
 
-    private static long getMoveScore(Board b, Move move)
+    /**
+     * Effectue les coups capturants afin d'évaluer une position dite calme ou discrète
+     *
+     * @param b : Position de jeu actuelle
+     * @param alpha : Borne alpha pour élagage
+     * @param beta : Borne beta pour élagage
+     * @return double : Evaluation de la position
+     */
+    public double QuiescentSearch(Board b, Double alpha, Double beta)
+    {
+        double eval = BasicEvaluation.evaluate(b);
+
+        if (eval >= beta)
+            return beta;
+        if (eval > alpha)
+            return alpha;
+
+        List<Move> captureMoves = b.pseudoLegalCaptures(); // Coups capturant
+        for (Move move : captureMoves)
+        {
+            b.doMove(move);
+            eval = -QuiescentSearch(b, -beta, -alpha); // On inverse le signe qui s'annule automatiquement 1 fois sur 2
+            b.undoMove();
+
+            if (eval >= beta)
+                return beta;
+            if (eval > alpha)
+                alpha = eval;
+        }
+        return alpha;
+    }
+
+    /**
+     * Evalue un coup en fonction de la pièce attaquée, de la promotion ou de la position finale de la pièce
+     *
+     * @param b : Etat du jeu actuel
+     * @param move : Coup qui va potentiellement être joué
+     * @return long : Score associé au coup
+     */
+    public static long getMoveScore(Board b, Move move)
     {
         Piece attackedPiece = b.getPiece(move.getTo());
         Piece attackingPiece = b.getPiece(move.getFrom());
 
         if (attackedPiece != Piece.NONE)
-            return Evaluator.getPieceStaticValue(attackedPiece);
+            return BasicEvaluation.getPieceStaticValue(attackedPiece);
         if (move.getPromotion() != Piece.NONE)
-            return Evaluator.getPieceStaticValue(move.getPromotion());
+            return BasicEvaluation.getPieceStaticValue(move.getPromotion());
 
-        return Evaluator.getSquareStaticValue(attackingPiece, move.getTo());
+        return BasicEvaluation.getSquareStaticValue(attackingPiece, move.getTo());
 
     }
 
     private void incrementNodesCount() {
-        this.nodesExplored++;
+        this.nodesExplored++; // MAJ nombre de noeuds explorés
     }
 
     public Integer getNodesExplored() {
