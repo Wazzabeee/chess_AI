@@ -14,7 +14,7 @@ It uses the [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) protocol. We 
 - tapered evaluation
 - piece square tables
 - transposition table
-- quiescent search
+- quiescense search
 - move ordering 
 - opening book (20 000 games)
 
