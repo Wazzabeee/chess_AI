@@ -5,14 +5,14 @@
 # Chess Engine : PVS
 ## About
 
-This chess AI was developed by Justin Aubin and myself for an end-of-term project part of 8INF878 : AI course at UQAC. You can find the written report about this project (in French) in the repo.
+This chess AI was developed by [Justin Aubin](https://github.com/Justin-Aubin) and myself for an end-of-term project part of 8INF878 : AI course at UQAC. You can find the written report about this project (in French) in the repo.
 
 It uses the [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) protocol. We implemented : 
 - principal variation splitting (distributed algorithm)
 - depth limited minimax with fail-soft alpha-beta pruning
 - material evaluation
 - tapered evaluation
-- piece square tables (
+- piece square tables
 - transposition table
 - quiescent search
 - move ordering 
