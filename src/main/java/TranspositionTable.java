@@ -7,7 +7,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class TranspositionTable {
-    private final Map<Long,hashNode> transpositionTable = new HashMap<>(64000);
+    private final Map<Long,hashNode> transpositionTable = new HashMap<>(64000); // Taille arbitraire
 
     public static class hashNode{
         protected double value;
@@ -20,7 +20,7 @@ public class TranspositionTable {
         }
     }
 
-    public double probeHash(long hashKey, int depth, double alpha, double beta)
+    public double searchHashNode(long hashKey, int depth, double alpha, double beta)
     {
         if (transpositionTable.containsKey(hashKey))
         {
@@ -30,31 +30,42 @@ public class TranspositionTable {
 
             if (current.depth > depth)
             {
-                if (current.type == 0)
+                if (current.type == 0) // Noeud exact
                 {
                     return current.value;
                 }
-                if (current.type == 1 && current.value <= alpha)
+                if (current.type == 1 && current.value <= alpha) // Fourchette haute
                 {
                     return alpha;
                 }
-                if (current.type == -1 && current.value >= beta)
+                if (current.type == -1 && current.value >= beta) // Fourchette basse
                 {
                     return beta;
                 }
             }
         }
-        return 99999999999.0;
+        return 99999999999.0; // Valeur arbitraire pour indiquer l'échec de la recherche
     }
 
     public void recordHash(long hashKey, int depth, double val, int type)
     {
-        transpositionTable.put(hashKey, new hashNode(val, depth, type));
+        transpositionTable.put(hashKey, new hashNode(val, depth, type)); // insère un élément dans la TT
     }
 
+    /**
+     * Minimax à profondeur limitée avec élagage alpha beta "sans faille" (fail-soft) + Transpostion Table
+     * (Fonction d'exemple car pas assez expérimenté avec la table de transpostions)
+     *
+     * @param board : Position de jeu actuelle
+     * @param depth : Profondeur restante de recherche
+     * @param alpha : Borne alpha pour élagage
+     * @param beta : Borne beta pour élagage
+     * @param playerToMaximize : Booléen (Vrai = BLanc, Noir sinon)
+     * @return : Record (Evaluation, bestMove, NodesExplored)
+     */
     public Result alphaBetaTranspositionTable(Board board, Integer depth, Double alpha, Double beta, Boolean playerToMaximize) {
 
-        double hashvalue = probeHash(board.getIncrementalHashKey(), depth, alpha, beta); // recherche dans la table
+        double hashvalue = searchHashNode(board.getIncrementalHashKey(), depth, alpha, beta); // recherche dans la table
         if (hashvalue != 99999999999.0) // si hashValue cohérent
         {
             return new Result(hashvalue, null, 0);
