@@ -1,5 +1,5 @@
 <p float="left">
-  <img src="https://github.com/Wazzabeee/chess_AI/blob/main/images/details.PNG" />
+  <img src="https://github.com/Wazzabeee/chess_AI/blob/main/images/wall_e.PNG" />
 </p>
 
 # Chess Engine : PVS
@@ -27,3 +27,9 @@ This has been possible thanks to [Chesslib](https://github.com/bhlangonijr/chess
 ## How to use
 The repo is a Maven project. Use the IDE of your choice to play with it. 
 You can play against the AI using the console and [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) commands or build a .JAR file and use it on a Graphical User Interface supporting UCI protocol : [Arena](http://www.playwitharena.de/).
+
+## Stats on Chess.com
+
+<p float="left">
+  <img src="https://github.com/Wazzabeee/chess_AI/blob/main/images/details.PNG" />
+</p>
