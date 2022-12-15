@@ -20,7 +20,7 @@ It uses the [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) protocol. We 
 
 It can deliver a move in less than a second at depth 5 on most computers. If your computer has lot of cores, you may want to try at depth 7 and modify the 1 second time limit in Timer.java.
 
-Thanks to it we won the small tournament organized between the IA of the students of the class.
+Thanks to it we won the small tournament organized between the AI of the students of the class.
 
 This has been possible thanks to [Chesslib](https://github.com/bhlangonijr/chesslib) for the chess rules and [Carballo](https://github.com/albertoruibal/carballo) for the reading of Polyglot files.
 
